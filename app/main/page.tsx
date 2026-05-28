@@ -16,25 +16,21 @@ export default function Home() {
   return (
     <main className="p-10">
 
-      <p className="text-gray-700 mb-8">
-        이번 여행 뭐하지?
-      </p>
-
       <section className="mb-8">
         {currentTrip ? (
-          <Link href="/current-trip">
-            <div className="cursor-pointer rounded-2xl bg-pink/70 p-5 shadow-md hover:bg-white">
-              <p className="text-sm text-pink-600 font-semibold">
+          <Link href="/trip?mode=view">
+            <div className="cursor-pointer rounded-2xl bg-white/70 p-5 shadow-md hover:bg-white">
+                <p className="text-sm text-pink-600 font-semibold">
                 현재 계획중인 여행
-              </p>
-              <h2 className="mt-2 text-2xl font-bold text-gray-800">
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-gray-800">
                 {currentTrip.title}
-              </h2>
-              <p className="mt-2 text-gray-700">{currentTrip.date}</p>
-              <p className="text-gray-700">{currentTrip.location}</p>
-              <p className="mt-4 text-gray-600">{currentTrip.notice}</p>
+                </h2>
+                <p className="mt-2 text-gray-700">{currentTrip.date}</p>
+                <p className="text-gray-700">{currentTrip.location}</p>
+                <p className="mt-4 text-gray-600">{currentTrip.notice}</p>
             </div>
-          </Link>
+            </Link>
         ) : (
           <div className="rounded-2xl border-2 border-dashed border-pink-50 bg-white/40 p-8 text-center text-gray-400">
             현재 계획된 여행이 없어요.
@@ -43,7 +39,7 @@ export default function Home() {
       </section>
 
       <div className="flex flex-col gap-4 items-start">
-        <Link href="/add-trip">
+        <Link href="/trip?mode=new">
           <button className="bg-pink-500 text-white px-6 py-3 rounded-2xl shadow-md hover:bg-blue-600 font-semibold">
             여행 추가하기
           </button>
@@ -55,6 +51,13 @@ export default function Home() {
           </button>
         </Link>
       </div>
+
+      <section className="mt-10 rounded-2xl bg-white/40 p-5 shadow-sm text-sm text-gray-600">
+        <p className="font-semibold text-pink-700">모임 정보</p>
+        <p className="mt-2">회장: 김유빈</p>
+        <p>총무: 신수영</p>
+        <p>오락부장 (2기): 박예은</p>
+        </section>
     </main>
   );
 }
