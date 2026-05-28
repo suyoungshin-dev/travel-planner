@@ -1,17 +1,21 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function TripPage() {
+/**
+ * useSearchParams()는 Vercel 빌드 시 Suspense 안에서 사용해야 해서
+ * 실제 화면 내용은 TripPageContent 컴포넌트에 넣어둔다.
+ */
+function TripPageContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode");
   const router = useRouter();
 
+  // mode=new 이면 신규 등록 화면, 아니면 기존 여행 조회 화면
   const isNewMode = mode === "new";
 
+  // 현재는 DB가 없어서 임시로 박아둔 여행 데이터
   const currentTrip = {
     title: "2026 여행",
     startDate: "2026-10-17",
@@ -20,55 +24,56 @@ export default function TripPage() {
     notice: "단체티 여부 논의 중 / 차량 협의 예정",
   };
 
-  const initialDate = isNewMode ? new Date(): new Date(currentTrip.startDate);
+  // 신규 추가일 때는 오늘 날짜, 조회일 때는 기존 여행 시작일 기준
+  const initialDate = isNewMode ? new Date() : new Date(currentTrip.startDate);
 
+  // 현재 달력에서 보고 있는 년/월
   const [currentDate, setCurrentDate] = useState(initialDate);
 
-  const [selectedStartDate, setSelectedStartDate] = useState<Date | null>
-  (
+  // 선택된 여행 시작일
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(
     isNewMode ? new Date() : new Date(currentTrip.startDate)
   );
 
-  const [selectedEndDate, setSelectedEndDate] = useState<Date | null>
-  (
+  // 선택된 여행 종료일
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(
     isNewMode
       ? new Date(new Date().setDate(new Date().getDate() + 1))
       : new Date(currentTrip.endDate)
   );
-  const [tripTitle, setTripTitle] = useState
-  (
+
+  // 여행명 입력값
+  const [tripTitle, setTripTitle] = useState(
     isNewMode ? "" : currentTrip.title
   );
 
-  const [tripLocation, setTripLocation] = useState
-  (
+  // 장소 입력값
+  const [tripLocation, setTripLocation] = useState(
     isNewMode ? "" : currentTrip.location
   );
 
-  const [tripNotice, setTripNotice] = useState
-  (
+  // 공지사항 입력값
+  const [tripNotice, setTripNotice] = useState(
     isNewMode ? "" : currentTrip.notice
   );
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
+  // 이전 달로 이동
   const handlePrevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
   };
 
+  // 다음 달로 이동
   const handleNextMonth = () => {
     setCurrentDate(new Date(year, month + 1, 1));
   };
 
+  // 날짜 클릭 시 신규 등록 모드에서만 여행 날짜 선택
   const handleDateClick = (day: number | null) => {
-    if (day === null) {
-      return;
-    }
-
-    if (!isNewMode) {
-      return;
-    }
+    if (day === null) return;
+    if (!isNewMode) return;
 
     const startDate = new Date(year, month, day);
     const endDate = new Date(year, month, day + 1);
@@ -77,14 +82,35 @@ export default function TripPage() {
     setSelectedEndDate(endDate);
   };
 
+  // 추가 버튼 클릭
   const handleAddTrip = () => {
     alert("여행이 추가되었어요!");
     router.push("/main");
   };
 
+  // 신규 추가 버튼 클릭 시 입력값 초기화 후 신규 등록 모드로 이동
+  const handleNewTripClick = () => {
+    setTripTitle("");
+    setTripLocation("");
+    setTripNotice("");
+
+    const today = new Date();
+    const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1));
+
+    setSelectedStartDate(today);
+    setSelectedEndDate(tomorrow);
+    setCurrentDate(today);
+
+    router.push("/trip?mode=new");
+  };
+
+  // 달력 첫 주 앞쪽 빈 칸 계산
   const firstDay = new Date(year, month, 1).getDay();
+
+  // 이번 달 마지막 날짜 계산
   const lastDate = new Date(year, month + 1, 0).getDate();
 
+  // 달력에 뿌릴 날짜 배열
   const days: (number | null)[] = [];
 
   for (let i = 0; i < firstDay; i++) {
@@ -95,6 +121,7 @@ export default function TripPage() {
     days.push(day);
   }
 
+  // 해당 날짜가 여행 기간에 포함되는지 확인
   const isTripDay = (day: number) => {
     if (isNewMode) {
       if (selectedStartDate === null || selectedEndDate === null) {
@@ -108,7 +135,10 @@ export default function TripPage() {
         return false;
       }
 
-      return day >= selectedStartDate.getDate() && day <= selectedEndDate.getDate();
+      return (
+        day >= selectedStartDate.getDate() &&
+        day <= selectedEndDate.getDate()
+      );
     }
 
     const tripStart = new Date(currentTrip.startDate);
@@ -136,18 +166,20 @@ export default function TripPage() {
           </h2>
         </div>
 
-        {!isNewMode &&
-          (
-            <p className="mt-2 text-sm text-gray-400">
-              수정은 집행부에게 문의하세요.
-            </p>
-          )}
+        {!isNewMode && (
+          <p className="mt-2 text-sm text-gray-400">
+            수정은 집행부에게 문의하세요.
+          </p>
+        )}
       </div>
 
       {/* 달력 영역 */}
       <section className="rounded-2xl bg-white/70 p-5 shadow-md">
         <div className="mb-4 flex items-center justify-between">
-          <button onClick={handlePrevMonth} className="rounded-xl bg-pink-100 px-3 py-1 text-pink-700 hover:bg-pink-200">
+          <button
+            onClick={handlePrevMonth}
+            className="rounded-xl bg-pink-100 px-3 py-1 text-pink-700 hover:bg-pink-200"
+          >
             ←
           </button>
 
@@ -155,7 +187,10 @@ export default function TripPage() {
             {year}년 {month + 1}월
           </h2>
 
-          <button onClick={handleNextMonth} className="rounded-xl bg-pink-100 px-3 py-1 text-pink-700 hover:bg-pink-200">
+          <button
+            onClick={handleNextMonth}
+            className="rounded-xl bg-pink-100 px-3 py-1 text-pink-700 hover:bg-pink-200"
+          >
             →
           </button>
         </div>
@@ -167,13 +202,20 @@ export default function TripPage() {
             </div>
           ))}
 
-          {days.map((day, index) =>
-          (
+          {days.map((day, index) => (
             <div
               key={index}
               onClick={() => handleDateClick(day)}
-              className={`rounded-xl py-3 ${day && isTripDay(day) ? "bg-pink-500 font-bold text-white" : "bg-pink-50 text-gray-700"} 
-              ${isNewMode && day && !isTripDay(day) ? "cursor-pointer hover:bg-pink-100" : ""}`}>
+              className={`rounded-xl py-3 ${
+                day && isTripDay(day)
+                  ? "bg-pink-500 font-bold text-white"
+                  : "bg-pink-50 text-gray-700"
+              } ${
+                isNewMode && day && !isTripDay(day)
+                  ? "cursor-pointer hover:bg-pink-100"
+                  : ""
+              }`}
+            >
               {day}
             </div>
           ))}
@@ -190,7 +232,9 @@ export default function TripPage() {
           disabled
           value={
             selectedStartDate && selectedEndDate
-              ? `${selectedStartDate.toISOString().slice(0, 10)} ~ ${selectedEndDate.toISOString().slice(0, 10)}`
+              ? `${selectedStartDate.toISOString().slice(0, 10)} ~ ${selectedEndDate
+                  .toISOString()
+                  .slice(0, 10)}`
               : ""
           }
           className="mt-2 w-full rounded-xl border border-pink-200 px-4 py-3 disabled:bg-gray-100"
@@ -231,39 +275,44 @@ export default function TripPage() {
       </section>
 
       {/* 추가 / 취소 버튼 영역 */}
-      {isNewMode ?
-        (
-          <div className="mt-6 flex gap-3">
-            <button onClick={handleAddTrip} className="rounded-2xl bg-pink-500 px-6 py-3 font-semibold text-white shadow-md hover:bg-pink-600">
-              추가
-            </button>
+      {isNewMode ? (
+        <div className="mt-6 flex gap-3">
+          <button
+            onClick={handleAddTrip}
+            className="rounded-2xl bg-pink-500 px-6 py-3 font-semibold text-white shadow-md hover:bg-pink-600"
+          >
+            추가
+          </button>
 
-            <button onClick={() => router.push("/main")} className="rounded-2xl bg-gray-200 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-300">
-              취소
-            </button>
-          </div>
-        ) : (
-          <div className="mt-6">
-            <button onClick={() => 
-              {
-                setTripTitle("");
-                setTripLocation("");
-                setTripNotice("");
-
-                setSelectedStartDate(new Date());
-
-                setSelectedEndDate(
-                  new Date(new Date().setDate(new Date().getDate() + 1))
-                );
-
-                setCurrentDate(new Date());
-
-                router.push("/trip?mode=new");
-              }}className="rounded-2xl bg-pink-500 px-6 py-3 font-semibold text-white shadow-md hover:bg-pink-600">
-              신규 추가
-            </button>
-          </div>          
-        )}
+          <button
+            onClick={() => router.push("/main")}
+            className="rounded-2xl bg-gray-200 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-300"
+          >
+            취소
+          </button>
+        </div>
+      ) : (
+        <div className="mt-6">
+          <button
+            onClick={handleNewTripClick}
+            className="rounded-2xl bg-pink-500 px-6 py-3 font-semibold text-white shadow-md hover:bg-pink-600"
+          >
+            신규 추가
+          </button>
+        </div>
+      )}
     </main>
+  );
+}
+
+/**
+ * Vercel 배포 에러 방지용 wrapper.
+ * TripPageContent 내부에서 useSearchParams()를 쓰기 때문에 Suspense로 감싸야 한다.
+ */
+export default function TripPage() {
+  return (
+    <Suspense fallback={<div className="p-10">Loading...</div>}>
+      <TripPageContent />
+    </Suspense>
   );
 }
