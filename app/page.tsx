@@ -1,33 +1,59 @@
-import Link from "next/link";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function LoginPage() 
+{
+
+  // 페이지 이동용
+  const router = useRouter();
+
+  // 입력 이름 저장
+  const [name, setName] = useState("");
+
+  // 테스트 이름
+  const testUsers = ["철수", "수영", "영희"];
+
+  // 로그인 버튼 이벤트
+  const handleLogin = () => {
+    if (testUsers.includes(name.trim())) 
+    {
+      localStorage.setItem("isLogin", "Y");
+      router.push("/main");
+    }
+    else 
+    {
+      alert("등록된 이름만 입장할 수 있어요.");
+    }
+  };
+
   return (
-    //<main className="min-h-screen bg-pink-50 p-10">
-    <main className="min-h-screen bg-gradient-to-b from-pink-100 to-violet-100 p-10">
-      <h1 className="text-4xl font-bold text-pink-900 mb-4">
-        11-1=0 ✈️
-      </h1>
+    <main className="px-7 pt-1">
 
-      <p className="text-gray-700 mb-8">
-        이번 여행 뭐하지?
-      </p>
+      <p className="mt-6 text-gray-800">이름을 입력해주세요</p>
 
-      <div className="flex flex-col gap-4 items-start">
+      <input
+        className="mt-4 w-full max-w-xs rounded-xl border border-pink-50 px-4 py-3 outline-none"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="예: 철수 (본명 두글자 - 테스트 : 철수)"
+        
+        onKeyDown={(e) => {
+          if (e.key === "Enter") 
+          {
+            handleLogin();
+          }
+        }}
+      />
 
-        <Link href="/add-trip">
-          <button className="bg-pink-500 text-white px-6 py-3 rounded-2xl shadow-md hover:bg-blue-600 font-semibold">
-            여행 추가하기
-          </button>
-        </Link>
-
-        <Link href="/history-trip">
-        <button className="bg-pink-500 text-white px-6 py-3 rounded-2xl shadow-md hover:bg-blue-600 font-semibold">
-          지난 여행보기
-        </button>
-        </Link>
-
-      </div>
-
+      {/* 로그인 버튼 */}
+      <button
+        onClick={handleLogin}
+        className="mt-5 block rounded-2xl bg-pink-500 px-8 py-4 font-bold text-white shadow-md"
+      >
+        입장하기
+      </button>
     </main>
   );
 }
