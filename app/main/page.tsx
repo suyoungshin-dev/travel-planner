@@ -51,13 +51,6 @@ export default function Home() {
           </button>
         </Link>
       </div>
-
-      <section className="mt-10 rounded-2xl bg-white/40 p-5 shadow-sm text-sm text-gray-600">
-        <p className="font-semibold text-pink-700">모임 정보</p>
-        <p className="mt-2">회장: 김유빈</p>
-        <p>총무: 신수영</p>
-        <p>오락부장 (2기): 박예은</p>
-        </section>
     </main>
   );
 }

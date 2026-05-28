@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -211,8 +213,8 @@ export default function TripPage() {
 
         <input
           disabled={!isNewMode}
-          value={tripNotice}
-          onChange={(e) => setTripNotice(e.target.value)}
+          value={tripLocation}
+          onChange={(e) => setTripLocation(e.target.value)}
           className="mt-2 w-full rounded-xl border border-pink-200 px-4 py-3 disabled:bg-gray-100"
         />
 
@@ -260,7 +262,7 @@ export default function TripPage() {
               }}className="rounded-2xl bg-pink-500 px-6 py-3 font-semibold text-white shadow-md hover:bg-pink-600">
               신규 추가
             </button>
-          </div>
+          </div>          
         )}
     </main>
   );

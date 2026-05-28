@@ -13,7 +13,7 @@ export default function LoginPage()
   const [name, setName] = useState("");
 
   // 테스트 이름
-  const testUsers = ["철수", "수영", "영희"];
+  const testUsers = ["유빈", "수영", "예은"];
 
   // 로그인 버튼 이벤트
   const handleLogin = () => {
@@ -37,7 +37,7 @@ export default function LoginPage()
         className="mt-4 w-full max-w-xs rounded-xl border border-pink-50 px-4 py-3 outline-none"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="예: 철수 (본명 두글자 - 테스트 : 철수)"
+        placeholder="예: 유빈 (본명 두글자 - 테스트 : 유빈)"
         
         onKeyDown={(e) => {
           if (e.key === "Enter") 
