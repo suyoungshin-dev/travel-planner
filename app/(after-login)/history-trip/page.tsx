@@ -49,12 +49,15 @@ export default function HistoryTripPage() {
       {/* 게시판 목록 */}
       <section className="mt-4 rounded-2xl bg-white shadow-sm">
         {/* 헤더 */}
-        <div className="grid grid-cols-[60px_1fr_180px_120px_100px] border-b border-gray-200 px-4 py-3 text-sm font-bold text-gray-500">
+        <div className="grid grid-cols-[50px_1fr_90px] border-b border-gray-200 px-4 py-3 text-sm font-bold text-gray-500 sm:grid-cols-[60px_1fr_180px_120px_100px]">
           <div>번호</div>
           <div>제목</div>
-          <div>여행날짜</div>
+
+          <div className="hidden sm:block">여행날짜</div>
+
           <div>등록일</div>
-          <div>등록자</div>
+
+          <div className="hidden sm:block">등록자</div>
         </div>
 
         {/* 목록 */}
@@ -62,13 +65,25 @@ export default function HistoryTripPage() {
           <div
             key={trip.id}
             onClick={() => handleRowClick(trip.id)}
-            className="grid cursor-pointer grid-cols-[60px_1fr_180px_120px_100px] border-b border-gray-100 px-4 py-4 text-sm hover:bg-pink-50"
+            className="grid cursor-pointer grid-cols-[50px_1fr_90px] border-b border-gray-100 px-4 py-4 text-sm hover:bg-pink-50 sm:grid-cols-[60px_1fr_180px_120px_100px]"
           >
             <div>{index + 1}</div>
-            <div className="font-medium text-gray-800">{trip.title}</div>
-            <div className="text-gray-500">{trip.tripDate}</div>
-            <div className="text-gray-500">{trip.updatedAt}</div>
-            <div className="text-gray-500">{trip.writerName}</div>
+
+            <div className="font-medium text-gray-800">
+              {trip.title}
+            </div>
+
+            <div className="hidden text-gray-500 sm:block">
+              {trip.tripDate}
+            </div>
+
+            <div className="text-gray-500">
+              {trip.updatedAt}
+            </div>
+
+            <div className="hidden text-gray-500 sm:block">
+              {trip.writerName}
+            </div>
           </div>
         ))}
       </section>
