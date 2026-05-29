@@ -86,7 +86,7 @@ export default function VotePage() {
 
             {/* 진행 완료된 투표 영역 */}
             <section>
-                <h2 className="mb-3 text-lg font-bold text-gray-700">
+                <h2 className="mt-10 text-lg font-bold text-gray-900">
                     진행 완료된 투표
                 </h2>
 

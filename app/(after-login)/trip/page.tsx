@@ -4,19 +4,13 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import BackButton from "@/app/components/BackButton";
 
-/**
- * useSearchParams()는 Vercel 빌드 시 Suspense 안에서 사용해야 해서
- * 실제 화면 내용은 TripPageContent 컴포넌트에 넣어둔다.
- */
 function TripPageContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode");
   const router = useRouter();
 
-  // mode=new 이면 신규 등록 화면, 아니면 기존 여행 조회 화면
   const isNewMode = mode === "new";
 
-  // 현재는 DB가 없어서 임시로 박아둔 여행 데이터
   const currentTrip = {
     title: "2026 여행",
     startDate: "2026-10-17",
@@ -25,40 +19,32 @@ function TripPageContent() {
     notice: "단체티 여부 논의 중 / 차량 협의 예정",
   };
 
-  // 신규 추가일 때는 오늘 날짜, 조회일 때는 기존 여행 시작일 기준
   const initialDate = isNewMode ? new Date() : new Date(currentTrip.startDate);
 
-  // 현재 달력에서 보고 있는 년/월
   const [currentDate, setCurrentDate] = useState(initialDate);
 
-  // 선택된 여행 시작일
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(
     isNewMode ? new Date() : new Date(currentTrip.startDate)
   );
 
-  // 선택된 여행 종료일
   const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(
     isNewMode
       ? new Date(new Date().setDate(new Date().getDate() + 1))
       : new Date(currentTrip.endDate)
   );
 
-  // 현재 선택 중인 날짜 입력칸
   const [activeDateField, setActiveDateField] = useState<"from" | "to">(
     "from"
   );
 
-  // 여행명 입력값
   const [tripTitle, setTripTitle] = useState(
     isNewMode ? "" : currentTrip.title
   );
 
-  // 장소 입력값
   const [tripLocation, setTripLocation] = useState(
     isNewMode ? "" : currentTrip.location
   );
 
-  // 공지사항 입력값
   const [tripNotice, setTripNotice] = useState(
     isNewMode ? "" : currentTrip.notice
   );
@@ -66,42 +52,32 @@ function TripPageContent() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  // 날짜를 yyyy-mm-dd 형태로 변환
   const formatDate = (date: Date | null) => {
     if (!date) return "";
-
     return date.toLocaleDateString("sv-SE").slice(0, 10);
   };
 
-  // 이전 달로 이동
   const handlePrevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
   };
 
-  // 다음 달로 이동
   const handleNextMonth = () => {
     setCurrentDate(new Date(year, month + 1, 1));
   };
 
-  // 날짜 클릭 시 신규 등록 모드에서만 여행 날짜 선택
   const handleDateClick = (day: number | null) => {
     if (day === null) return;
     if (!isNewMode) return;
 
     const clickedDate = new Date(year, month, day);
 
-    // 시작일 tb 선택 상태일 때
-    // 시작일을 바꾸면 종료일은 기본 1박2일로 자동 세팅
     if (activeDateField === "from") {
-      const nextDate = new Date(clickedDate);
-      nextDate.setDate(clickedDate.getDate() + 1);
+      const nextDate = new Date(year, month, day + 1);
 
       setSelectedStartDate(clickedDate);
       setSelectedEndDate(nextDate);
     }
 
-    // 종료일 tb 선택 상태일 때
-    // 종료일만 사용자가 직접 변경
     if (activeDateField === "to") {
       if (selectedStartDate && clickedDate < selectedStartDate) {
         alert("종료일은 시작일보다 빠를 수 없어요.");
@@ -112,20 +88,22 @@ function TripPageContent() {
     }
   };
 
-  // 추가 버튼 클릭
   const handleAddTrip = () => {
     alert("여행이 추가되었어요!");
     router.push("/main");
   };
 
-  // 신규 추가 버튼 클릭 시 입력값 초기화 후 신규 등록 모드로 이동
   const handleNewTripClick = () => {
     setTripTitle("");
     setTripLocation("");
     setTripNotice("");
 
     const today = new Date();
-    const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1));
+    const tomorrow = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + 1
+    );
 
     setSelectedStartDate(today);
     setSelectedEndDate(tomorrow);
@@ -135,13 +113,9 @@ function TripPageContent() {
     router.push("/trip?mode=new");
   };
 
-  // 달력 첫 주 앞쪽 빈 칸 계산
   const firstDay = new Date(year, month, 1).getDay();
-
-  // 이번 달 마지막 날짜 계산
   const lastDate = new Date(year, month + 1, 0).getDate();
 
-  // 달력에 뿌릴 날짜 배열
   const days: (number | null)[] = [];
 
   for (let i = 0; i < firstDay; i++) {
@@ -152,38 +126,36 @@ function TripPageContent() {
     days.push(day);
   }
 
-  // 해당 날짜가 여행 기간에 포함되는지 확인
   const isTripDay = (day: number) => {
+    if (!selectedStartDate || !selectedEndDate) return false;
+
     const targetDate = new Date(year, month, day);
 
-    if (isNewMode) {
-      if (selectedStartDate === null || selectedEndDate === null) {
-        return false;
-      }
+    const startDate = new Date(
+      selectedStartDate.getFullYear(),
+      selectedStartDate.getMonth(),
+      selectedStartDate.getDate()
+    );
 
-      return targetDate >= selectedStartDate && targetDate <= selectedEndDate;
-    }
+    const endDate = new Date(
+      selectedEndDate.getFullYear(),
+      selectedEndDate.getMonth(),
+      selectedEndDate.getDate()
+    );
 
-    const tripStart = new Date(currentTrip.startDate);
-    const tripEnd = new Date(currentTrip.endDate);
-
-    return targetDate >= tripStart && targetDate <= tripEnd;
+    return targetDate >= startDate && targetDate <= endDate;
   };
 
   return (
     <main className="p-10">
-      {/* 뒤로가기 버튼 */}
       <BackButton />
 
-      <p className="mt-2 text-xs text-gray-500">
-        테스트 화면이랍니다..
-      </p>
-      {/* 상단 화면 타이틀 영역 - 계획된 여행일 때만 표시 */}
+      <p className="mt-2 text-xs text-gray-500">테스트 화면이랍니다..</p>
+
       {!isNewMode && (
         <div className="mb-5 rounded-2xl bg-white/50 p-4 shadow-sm">
           <div className="flex items-center gap-2">
             <span className="text-lg">📌</span>
-
             <p className="text-sm text-gray-700">
               수정은 집행부에게 문의하세요.
             </p>
@@ -191,7 +163,6 @@ function TripPageContent() {
         </div>
       )}
 
-      {/* 달력 영역 */}
       <section className="rounded-2xl bg-white/70 p-5 shadow-md">
         <div className="mb-4 flex items-center justify-between">
           <button
@@ -224,13 +195,11 @@ function TripPageContent() {
             <div
               key={index}
               onClick={() => handleDateClick(day)}
-              className={`rounded-xl py-3 ${day && isTripDay(day)
-                ? "bg-pink-500 font-bold text-white"
-                : "bg-pink-50 text-gray-700"
-                } ${isNewMode && day && !isTripDay(day)
-                  ? "cursor-pointer hover:bg-pink-100"
-                  : ""
-                }`}
+              className={`rounded-2xl p-4 ${
+                day !== null && isTripDay(day)
+                  ? "bg-pink-500 text-white"
+                  : "bg-pink-50 text-gray-900"
+              }`}
             >
               {day}
             </div>
@@ -238,38 +207,36 @@ function TripPageContent() {
         </div>
       </section>
 
-      {/* 여행 정보 입력/조회 영역 */}
       <section className="mt-6 rounded-2xl bg-white/70 p-5 shadow-md">
         <label className="block text-sm font-semibold text-gray-700">
           여행 날짜
         </label>
 
-        {/* from / to 날짜 tb */}
         <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          {/* 시작일 tb */}
           <input
             readOnly
             disabled={!isNewMode}
             value={formatDate(selectedStartDate)}
             onClick={() => setActiveDateField("from")}
-            className={`w-full rounded-xl border px-4 py-3 disabled:bg-gray-100 ${isNewMode && activeDateField === "from"
-              ? "border-pink-400 bg-pink-50"
-              : "border-pink-200"
-              }`}
+            className={`w-full rounded-xl border px-4 py-3 disabled:bg-gray-100 ${
+              isNewMode && activeDateField === "from"
+                ? "border-pink-400 bg-pink-50"
+                : "border-pink-200"
+            }`}
           />
 
           <span className="text-gray-400">~</span>
 
-          {/* 종료일 tb */}
           <input
             readOnly
             disabled={!isNewMode}
             value={formatDate(selectedEndDate)}
             onClick={() => setActiveDateField("to")}
-            className={`w-full rounded-xl border px-4 py-3 disabled:bg-gray-100 ${isNewMode && activeDateField === "to"
-              ? "border-pink-400 bg-pink-50"
-              : "border-pink-200"
-              }`}
+            className={`w-full rounded-xl border px-4 py-3 disabled:bg-gray-100 ${
+              isNewMode && activeDateField === "to"
+                ? "border-pink-400 bg-pink-50"
+                : "border-pink-200"
+            }`}
           />
         </div>
 
@@ -312,7 +279,6 @@ function TripPageContent() {
         />
       </section>
 
-      {/* 추가 / 취소 버튼 영역 */}
       {isNewMode ? (
         <div className="mt-6 flex gap-3">
           <button
@@ -343,10 +309,6 @@ function TripPageContent() {
   );
 }
 
-/**
- * Vercel 배포 에러 방지용 wrapper.
- * TripPageContent 내부에서 useSearchParams()를 쓰기 때문에 Suspense로 감싸야 함
- */
 export default function TripPage() {
   return (
     <Suspense fallback={<div className="p-10">Loading...</div>}>

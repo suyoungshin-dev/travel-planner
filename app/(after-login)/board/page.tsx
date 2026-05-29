@@ -135,6 +135,7 @@ export default function BoardPage() {
       <p className="mt-2 text-xs text-gray-500">
         자유롭게 의견을 올려주세요. <br />
         올린다고 100% 반영되진 않아요.. <br />
+        여기는 데이터 테스트중.. <br />
         (데이터 용량으로 인해 멋대로 삭제될 수 있습니다.) <br />
       </p>
 

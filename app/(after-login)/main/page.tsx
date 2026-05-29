@@ -6,10 +6,10 @@ export default function Home() {
   const activeVoteCount = 2;   /*투표 건 수*/
   const currentTrip = hasCurrentTrip
     ? {
-      title: "2026 여행",
+      title: "✌ 2026 여행 ✌",
       date: "2026-10-17 ~ 2026-10-18",
-      location: "미정",
-      notice: "단체티 여부 논의 중 / 차량 협의 예정",
+      location: "테스트 데이터임!",
+      notice: "단체티 등등.. 공지.. 가짜데이터임..",
     }
     : null;
 
