@@ -14,7 +14,7 @@ export default function Home() {
     : null;
 
   return (
-    <main className="p-10">
+    <main className="px-4 py-3">
 
       <section className="mb-8">
         {currentTrip ? (
@@ -39,16 +39,20 @@ export default function Home() {
       </section>
 
       <div className="flex flex-col gap-4 items-start">
-        <Link href="/trip?mode=new">
-          <button className="bg-pink-500 text-white px-6 py-3 rounded-2xl shadow-md hover:bg-blue-600 font-semibold">
-            여행 추가하기
-          </button>
+        <Link href="/trip?mode=new" className="bg-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-md">
+          여행 추가하기
         </Link>
 
-        <Link href="/history-trip">
-          <button className="bg-pink-500 text-white px-6 py-3 rounded-2xl shadow-md hover:bg-blue-600 font-semibold">
-            지난 여행보기
-          </button>
+        <Link href="/history-trip" className="bg-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-md" >
+          지난 여행보기
+        </Link>
+
+        <Link href="/board" className="bg-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-md">
+          건의사항
+        </Link>
+
+        <Link href="/admin" className="bg-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-md">
+          관리
         </Link>
       </div>
     </main>

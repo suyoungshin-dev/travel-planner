@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import BackButton from "@/app/components/BackButton";
 
 /**
  * useSearchParams()는 Vercel 빌드 시 Suspense 안에서 사용해야 해서
@@ -156,22 +157,24 @@ function TripPageContent() {
 
   return (
     <main className="p-10">
-      {/* 상단 화면 타이틀 영역 */}
-      <div className="mb-5 rounded-2xl bg-white/50 p-4 shadow-sm">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">📌</span>
+      {/* 뒤로가기 버튼 */}
+      <BackButton />
 
-          <h2 className="text-lg font-bold text-pink-700">
-            {isNewMode ? "여행 추가하기" : "다가오는 여행"}
-          </h2>
+      {/* 상단 화면 타이틀 영역 - 계획된 여행일 때만 표시 */}
+      {!isNewMode && (
+        <div className="mb-5 rounded-2xl bg-white/50 p-4 shadow-sm">
+
+          <div className="flex items-center gap-2">
+
+            <span className="text-lg">📌</span>
+
+            <p className="text-sm text-gray-700">
+              수정은 집행부에게 문의하세요.
+            </p>
+
+          </div>
         </div>
-
-        {!isNewMode && (
-          <p className="mt-2 text-sm text-gray-400">
-            수정은 집행부에게 문의하세요.
-          </p>
-        )}
-      </div>
+      )}
 
       {/* 달력 영역 */}
       <section className="rounded-2xl bg-white/70 p-5 shadow-md">
@@ -206,15 +209,13 @@ function TripPageContent() {
             <div
               key={index}
               onClick={() => handleDateClick(day)}
-              className={`rounded-xl py-3 ${
-                day && isTripDay(day)
-                  ? "bg-pink-500 font-bold text-white"
-                  : "bg-pink-50 text-gray-700"
-              } ${
-                isNewMode && day && !isTripDay(day)
+              className={`rounded-xl py-3 ${day && isTripDay(day)
+                ? "bg-pink-500 font-bold text-white"
+                : "bg-pink-50 text-gray-700"
+                } ${isNewMode && day && !isTripDay(day)
                   ? "cursor-pointer hover:bg-pink-100"
                   : ""
-              }`}
+                }`}
             >
               {day}
             </div>
@@ -232,9 +233,9 @@ function TripPageContent() {
           disabled
           value={
             selectedStartDate && selectedEndDate
-              ? `${selectedStartDate.toISOString().slice(0, 10)} ~ ${selectedEndDate
-                  .toISOString()
-                  .slice(0, 10)}`
+              ? `${selectedStartDate.toLocaleDateString("sv-SE").slice(0, 10)} ~ ${selectedEndDate
+                .toLocaleDateString("sv-SE")
+                .slice(0, 10)}`
               : ""
           }
           className="mt-2 w-full rounded-xl border border-pink-200 px-4 py-3 disabled:bg-gray-100"
