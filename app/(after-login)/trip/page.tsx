@@ -43,6 +43,11 @@ function TripPageContent() {
       : new Date(currentTrip.endDate)
   );
 
+  // 현재 선택 중인 날짜 입력칸
+  const [activeDateField, setActiveDateField] = useState<"from" | "to">(
+    "from"
+  );
+
   // 여행명 입력값
   const [tripTitle, setTripTitle] = useState(
     isNewMode ? "" : currentTrip.title
@@ -61,6 +66,13 @@ function TripPageContent() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
+  // 날짜를 yyyy-mm-dd 형태로 변환
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
+
+    return date.toLocaleDateString("sv-SE").slice(0, 10);
+  };
+
   // 이전 달로 이동
   const handlePrevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
@@ -76,11 +88,28 @@ function TripPageContent() {
     if (day === null) return;
     if (!isNewMode) return;
 
-    const startDate = new Date(year, month, day);
-    const endDate = new Date(year, month, day + 1);
+    const clickedDate = new Date(year, month, day);
 
-    setSelectedStartDate(startDate);
-    setSelectedEndDate(endDate);
+    // 시작일 tb 선택 상태일 때
+    // 시작일을 바꾸면 종료일은 기본 1박2일로 자동 세팅
+    if (activeDateField === "from") {
+      const nextDate = new Date(clickedDate);
+      nextDate.setDate(clickedDate.getDate() + 1);
+
+      setSelectedStartDate(clickedDate);
+      setSelectedEndDate(nextDate);
+    }
+
+    // 종료일 tb 선택 상태일 때
+    // 종료일만 사용자가 직접 변경
+    if (activeDateField === "to") {
+      if (selectedStartDate && clickedDate < selectedStartDate) {
+        alert("종료일은 시작일보다 빠를 수 없어요.");
+        return;
+      }
+
+      setSelectedEndDate(clickedDate);
+    }
   };
 
   // 추가 버튼 클릭
@@ -101,6 +130,7 @@ function TripPageContent() {
     setSelectedStartDate(today);
     setSelectedEndDate(tomorrow);
     setCurrentDate(today);
+    setActiveDateField("from");
 
     router.push("/trip?mode=new");
   };
@@ -124,35 +154,20 @@ function TripPageContent() {
 
   // 해당 날짜가 여행 기간에 포함되는지 확인
   const isTripDay = (day: number) => {
+    const targetDate = new Date(year, month, day);
+
     if (isNewMode) {
       if (selectedStartDate === null || selectedEndDate === null) {
         return false;
       }
 
-      const isSameYear = year === selectedStartDate.getFullYear();
-      const isSameMonth = month === selectedStartDate.getMonth();
-
-      if (!isSameYear || !isSameMonth) {
-        return false;
-      }
-
-      return (
-        day >= selectedStartDate.getDate() &&
-        day <= selectedEndDate.getDate()
-      );
+      return targetDate >= selectedStartDate && targetDate <= selectedEndDate;
     }
 
     const tripStart = new Date(currentTrip.startDate);
     const tripEnd = new Date(currentTrip.endDate);
 
-    const isTripYear = year === tripStart.getFullYear();
-    const isTripMonth = month === tripStart.getMonth();
-
-    if (!isTripYear || !isTripMonth) {
-      return false;
-    }
-
-    return day >= tripStart.getDate() && day <= tripEnd.getDate();
+    return targetDate >= tripStart && targetDate <= tripEnd;
   };
 
   return (
@@ -163,15 +178,12 @@ function TripPageContent() {
       {/* 상단 화면 타이틀 영역 - 계획된 여행일 때만 표시 */}
       {!isNewMode && (
         <div className="mb-5 rounded-2xl bg-white/50 p-4 shadow-sm">
-
           <div className="flex items-center gap-2">
-
             <span className="text-lg">📌</span>
 
             <p className="text-sm text-gray-700">
               수정은 집행부에게 문의하세요.
             </p>
-
           </div>
         </div>
       )}
@@ -210,8 +222,8 @@ function TripPageContent() {
               key={index}
               onClick={() => handleDateClick(day)}
               className={`rounded-xl py-3 ${day && isTripDay(day)
-                ? "bg-pink-500 font-bold text-white"
-                : "bg-pink-50 text-gray-700"
+                  ? "bg-pink-500 font-bold text-white"
+                  : "bg-pink-50 text-gray-700"
                 } ${isNewMode && day && !isTripDay(day)
                   ? "cursor-pointer hover:bg-pink-100"
                   : ""
@@ -229,17 +241,39 @@ function TripPageContent() {
           여행 날짜
         </label>
 
-        <input
-          disabled
-          value={
-            selectedStartDate && selectedEndDate
-              ? `${selectedStartDate.toLocaleDateString("sv-SE").slice(0, 10)} ~ ${selectedEndDate
-                .toLocaleDateString("sv-SE")
-                .slice(0, 10)}`
-              : ""
-          }
-          className="mt-2 w-full rounded-xl border border-pink-200 px-4 py-3 disabled:bg-gray-100"
-        />
+        {/* from / to 날짜 tb */}
+        <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          {/* 시작일 tb */}
+          <input
+            readOnly
+            disabled={!isNewMode}
+            value={formatDate(selectedStartDate)}
+            onClick={() => setActiveDateField("from")}
+            className={`w-full rounded-xl border px-4 py-3 disabled:bg-gray-100 ${isNewMode && activeDateField === "from"
+                ? "border-pink-400 bg-pink-50"
+                : "border-pink-200"
+              }`}
+          />
+
+          <span className="text-gray-400">~</span>
+
+          {/* 종료일 tb */}
+          <input
+            readOnly
+            disabled={!isNewMode}
+            value={formatDate(selectedEndDate)}
+            onClick={() => setActiveDateField("to")}
+            className={`w-full rounded-xl border px-4 py-3 disabled:bg-gray-100 ${isNewMode && activeDateField === "to"
+                ? "border-pink-400 bg-pink-50"
+                : "border-pink-200"
+              }`}
+          />
+        </div>
+
+        <p className="mt-2 text-xs text-gray-400">
+          시작일을 선택하면 기본 1박 2일로 설정! <br />
+          종료일을 눌러 날짜를 변경할 수 있어요 🔥
+        </p>
 
         <label className="mt-4 block text-sm font-semibold text-gray-700">
           여행명
@@ -308,7 +342,7 @@ function TripPageContent() {
 
 /**
  * Vercel 배포 에러 방지용 wrapper.
- * TripPageContent 내부에서 useSearchParams()를 쓰기 때문에 Suspense로 감싸야 한다.
+ * TripPageContent 내부에서 useSearchParams()를 쓰기 때문에 Suspense로 감싸야 함
  */
 export default function TripPage() {
   return (

@@ -1,9 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 export default function Header() {
-
   // 페이지 이동용 Router
   const router = useRouter();
 
@@ -12,12 +12,19 @@ export default function Header() {
 
   const searchParams = useSearchParams();
 
+  // 로그인 화면 여부
+  const isLoginPage = pathname === "/";
+
   // 집행부 여부
-  const isAdmin = false;
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const adminYn = localStorage.getItem("isAdmin");
+    setIsAdmin(adminYn === "Y");
+  }, [pathname]);
 
   // 화면별 메뉴명
   const getTitle = () => {
-
     if (pathname.includes("/trip")) {
       const mode = searchParams.get("mode");
 
@@ -36,6 +43,10 @@ export default function Header() {
       return "건의사항";
     }
 
+    if (pathname.includes("/admin")) {
+      return "관리";
+    }
+
     if (pathname.includes("/main")) {
       return "";
     }
@@ -45,22 +56,18 @@ export default function Header() {
 
   // 로고 클릭 이벤트
   const handleHomeClick = () => {
-
     const isLogin = localStorage.getItem("isLogin");
 
     if (isLogin === "Y") {
       router.push("/main");
-    }
-    else {
+    } else {
       router.push("/");
     }
   };
 
   return (
-
     /* 공통 상단 헤더 */
     <header className="mb-0 flex items-center gap-3 px-5 pt-4">
-
       {/* 사이트 로고 */}
       <h1
         onClick={handleHomeClick}
@@ -71,23 +78,24 @@ export default function Header() {
 
       {/* 메뉴명 */}
       <div className="flex items-end gap-2">
-
         {/* 현재 화면 메뉴명 */}
         {getTitle() && (
           <span className="text-xl font-bold text-pink-500">
             {getTitle()}
           </span>
         )}
+             
 
-        {/* 집행부 표시 */}
-        {isAdmin && (
-          <span className="text-sm font-bold text-gray-400">
-            (집행부)
-          </span>
+        {/* 집행부 전용 관리 버튼 - 집행부 여부 변경 */}
+        {!isLoginPage && isAdmin && pathname !== "/admin" && (
+          <button
+            onClick={() => router.push("/admin")}
+            className="ml-1 rounded-lg bg-gray-200 px-3 py-1 text-sm font-bold text-gray-700"
+          >
+            관리
+          </button>
         )}
-
       </div>
-
     </header>
   );
 }

@@ -42,7 +42,7 @@ export default function LoginPage() {
         className="mt-4 w-full max-w-xs rounded-xl border border-pink-50 px-4 py-3 outline-none"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="이름 두글자를 입력하세요. (예: 유빈)"
+        placeholder="이름 두글자를 입력하세요. (예: 창섭)"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             handleLogin();
