@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "./components/Header";
+import HeaderWrapper from "./components/HeaderWrapper";
 
 export const metadata: Metadata = {
   title: "Travel Planner",
@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className="bg-gradient-to-b from-pink-100 to-violet-100 min-h-screen">
         <div className="min-h-screen flex flex-col">
-          <Header />
+          <HeaderWrapper />
 
           <div className="flex-1">
             {children}
