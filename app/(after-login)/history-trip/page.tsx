@@ -38,9 +38,13 @@ export default function HistoryTripPage() {
   };
 
   return (
-    <main className="p-6">
+    <main className="px-5 py-4">
       {/* 뒤로가기 버튼 */}
       <BackButton />
+
+      <p className="mt-2 text-xs text-gray-500">
+        테스트 화면이랍니다..
+      </p>
 
       {/* 게시판 목록 */}
       <section className="mt-4 rounded-2xl bg-white shadow-sm">

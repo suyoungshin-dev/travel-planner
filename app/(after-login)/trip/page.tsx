@@ -175,6 +175,9 @@ function TripPageContent() {
       {/* 뒤로가기 버튼 */}
       <BackButton />
 
+      <p className="mt-2 text-xs text-gray-500">
+        테스트 화면이랍니다..
+      </p>
       {/* 상단 화면 타이틀 영역 - 계획된 여행일 때만 표시 */}
       {!isNewMode && (
         <div className="mb-5 rounded-2xl bg-white/50 p-4 shadow-sm">
@@ -222,8 +225,8 @@ function TripPageContent() {
               key={index}
               onClick={() => handleDateClick(day)}
               className={`rounded-xl py-3 ${day && isTripDay(day)
-                  ? "bg-pink-500 font-bold text-white"
-                  : "bg-pink-50 text-gray-700"
+                ? "bg-pink-500 font-bold text-white"
+                : "bg-pink-50 text-gray-700"
                 } ${isNewMode && day && !isTripDay(day)
                   ? "cursor-pointer hover:bg-pink-100"
                   : ""
@@ -250,8 +253,8 @@ function TripPageContent() {
             value={formatDate(selectedStartDate)}
             onClick={() => setActiveDateField("from")}
             className={`w-full rounded-xl border px-4 py-3 disabled:bg-gray-100 ${isNewMode && activeDateField === "from"
-                ? "border-pink-400 bg-pink-50"
-                : "border-pink-200"
+              ? "border-pink-400 bg-pink-50"
+              : "border-pink-200"
               }`}
           />
 
@@ -264,8 +267,8 @@ function TripPageContent() {
             value={formatDate(selectedEndDate)}
             onClick={() => setActiveDateField("to")}
             className={`w-full rounded-xl border px-4 py-3 disabled:bg-gray-100 ${isNewMode && activeDateField === "to"
-                ? "border-pink-400 bg-pink-50"
-                : "border-pink-200"
+              ? "border-pink-400 bg-pink-50"
+              : "border-pink-200"
               }`}
           />
         </div>

@@ -54,8 +54,12 @@ export default function VotePage() {
 
             <h1 className="mb-6 text-2xl font-bold text-gray-800">투표</h1>
 
+            <p className="mt-2 text-xs text-gray-500">
+                테스트 화면이랍니다..
+            </p>
+
             {/* 진행중인 투표 영역 */}
-            <section className="mb-8">
+            <section className="mb-4">
                 <h2 className="mb-3 text-lg font-bold text-pink-600">
                     진행중인 투표
                 </h2>

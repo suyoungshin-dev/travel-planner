@@ -9,7 +9,7 @@ export default function HistoryTripDetailPage() {
     title: "2025 강릉 여행",
     startDate: "2025-10-18",
     endDate: "2025-10-19",
-    accommodation : "숙소",
+    accommodation: "숙소",
     content:
       "강릉 중앙시장 방문\n삼겹살 + 보드게임 진행\n숙소 체크인 15:00",
     expense: "350000",
@@ -20,6 +20,10 @@ export default function HistoryTripDetailPage() {
 
       {/* 뒤로가기 버튼 */}
       <BackButton />
+
+      <p className="mt-2 text-xs text-gray-500">
+        테스트 화면이랍니다..
+      </p>
 
       {/* 상세 영역 */}
       <section className="mt-4 rounded-2xl bg-white p-5 shadow-sm">
