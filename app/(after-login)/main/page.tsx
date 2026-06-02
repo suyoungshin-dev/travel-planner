@@ -9,7 +9,7 @@ export default function Home() {
       title: "✌ 2026 여행 ✌",
       date: "2026-10-17 ~ 2026-10-18",
       location: "테스트 데이터임!",
-      notice: "단체티 등등.. 공지.. 가짜데이터임..",
+      notice: "아직 지난여행, 한줄대화만 완성..",
     }
     : null;
 
@@ -38,21 +38,30 @@ export default function Home() {
         )}
       </section>
 
-      <div className="flex flex-col gap-4 items-start">
-        <Link href="/trip?mode=new" className="bg-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-md">
-          여행 추가하기
+      <div className="mt-6 grid w-fit grid-cols-3 gap-4">
+                
+        <Link
+          href="/history-trip"
+          className="bg-pink-500 text-white rounded-2xl font-semibold shadow-md
+          w-32 h-32 flex items-center justify-center text-sm text-center"
+        >
+          저장된 여행
         </Link>
 
-        <Link href="/history-trip" className="bg-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-md" >
-          지난 여행보기
+        <Link
+          href="/board"
+          className="bg-pink-500 text-white rounded-2xl font-semibold shadow-md
+          w-32 h-32 flex items-center justify-center text-sm text-center"
+        >
+          한줄대화
         </Link>
 
-        <Link href="/board" className="bg-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-md">
-          건의사항
-        </Link>
-
-        <Link href="/vote" className="bg-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-md">
-          투표{activeVoteCount > 0 ? ` (${activeVoteCount}건)` : ""}
+        <Link
+          href="/vote"
+          className="bg-pink-500 text-white rounded-2xl font-semibold shadow-md
+          w-32 h-32 flex items-center justify-center text-sm text-center"
+        >
+          투표 {activeVoteCount > 0 ? ` (${activeVoteCount}건)` : ""}
         </Link>
       </div>
     </main>

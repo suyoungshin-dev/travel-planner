@@ -4,57 +4,44 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 export default function Header() {
-  // 페이지 이동용 Router
   const router = useRouter();
-
-  // 현재 경로 확인
   const pathname = usePathname();
-
   const searchParams = useSearchParams();
 
-  // 로그인 화면 여부
   const isLoginPage = pathname === "/";
 
-  // 집행부 여부
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    const adminYn = localStorage.getItem("isAdmin");
-    setIsAdmin(adminYn === "Y");
+    const getLoginUser = () => {
+      const adminYn = localStorage.getItem("isAdmin");
+      const loginUserName = localStorage.getItem("loginUserName");
+
+      setIsAdmin(adminYn === "Y");
+      setUserName(loginUserName ?? "");
+    };
+
+    getLoginUser();
   }, [pathname]);
 
-  // 화면별 메뉴명
   const getTitle = () => {
     if (pathname.includes("/trip")) {
       const mode = searchParams.get("mode");
 
-      if (mode === "new") {
-        return "여행 추가하기";
-      }
+      if (mode === "new") return "여행 추가하기";
 
       return "다가오는 여행";
     }
 
-    if (pathname.includes("/history-trip")) {
-      return "지난 여행보기";
-    }
-
-    if (pathname.includes("/board")) {
-      return "건의사항";
-    }
-
-    if (pathname.includes("/admin")) {
-      return "관리";
-    }
-
-    if (pathname.includes("/main")) {
-      return "";
-    }
+    if (pathname.includes("/history-trip")) return "여행 저장";
+    if (pathname.includes("/board")) return "한줄대화";
+    if (pathname.includes("/admin")) return "관리";
+    if (pathname.includes("/main")) return "";
 
     return "";
   };
 
-  // 로고 클릭 이벤트
   const handleHomeClick = () => {
     const isLogin = localStorage.getItem("isLogin");
 
@@ -66,27 +53,27 @@ export default function Header() {
   };
 
   return (
-    /* 공통 상단 헤더 */
     <header className="mb-0 flex items-center gap-3 px-5 pt-4">
-      {/* 사이트 로고 */}
-      <h1
-        onClick={handleHomeClick}
-        className="cursor-pointer text-4xl font-bold text-pink-900"
-      >
-        11-1=0 ✈️
-      </h1>
-
-      {/* 메뉴명 */}
       <div className="flex items-end gap-2">
-        {/* 현재 화면 메뉴명 */}
-        {getTitle() && (
-          <span className="text-xl font-bold text-pink-500">
-            {getTitle()}
+        <h1
+          onClick={handleHomeClick}
+          className="cursor-pointer text-4xl font-bold text-pink-900"
+        >
+          11-1=0 ✈️
+        </h1>
+
+        {!isLoginPage && userName && (
+          <span className="pb-1 text-sm font-bold text-gray-500">
+            👤 {userName}
           </span>
         )}
-             
+      </div>
 
-        {/* 집행부 전용 관리 버튼 - 집행부 여부 변경 */}
+      <div className="flex items-end gap-2">
+        {getTitle() && (
+          <span className="text-xl font-bold text-pink-500">{getTitle()}</span>
+        )}
+
         {!isLoginPage && isAdmin && pathname !== "/admin" && (
           <button
             onClick={() => router.push("/admin")}

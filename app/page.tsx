@@ -25,7 +25,8 @@ export default function LoginPage() {
     if (user) {
       localStorage.setItem("isLogin", "Y");
       localStorage.setItem("loginUserId", user.user_id);
-      localStorage.setItem("loginUserName", user.user_name[0]);
+      //localStorage.setItem("loginUserName", user.user_name[0]);
+      localStorage.setItem("loginUserName", inputName);
       localStorage.setItem("isAdmin", user.auth_yn);
 
       router.push("/main");
