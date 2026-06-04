@@ -103,6 +103,20 @@ export default function HistoryTripDetailPage() {
       .reduce((sum, value) => sum + value, 0);
   };
 
+  // 날짜 입력 자동 포맷
+  const formatDateInput = (value: string) => {
+    const onlyNumber = value.replace(/[^0-9]/g, "").slice(0, 8);
+
+    if (onlyNumber.length <= 4) {
+      return onlyNumber;
+    }
+
+    if (onlyNumber.length <= 6) {
+      return `${onlyNumber.slice(0, 4)}-${onlyNumber.slice(4)}`;
+    }
+
+    return `${onlyNumber.slice(0, 4)}-${onlyNumber.slice(4, 6)}-${onlyNumber.slice(6)}`;
+  };
   // 기존 데이터에 이름이 없을 때만 ele_user에서 조회
   const getUserName = async (userId: string) => {
     if (!userId) return "";
@@ -345,20 +359,6 @@ export default function HistoryTripDetailPage() {
             <span className="text-sm font-bold text-gray-500">제목 </span>
             <span className="text-xs font-bold text-red-400">  * </span>
 
-            <label className="flex items-center gap-1 text-sm text-pink-500">
-              <input
-                type="checkbox"
-                checked={tripDetail.isRegular}
-                onChange={(e) =>
-                  setTripDetail({
-                    ...tripDetail,
-                    isRegular: e.target.checked,
-                  })
-                }
-                className="h-4 w-4 accent-pink-500"
-              />
-              정기모임
-            </label>
           </div>
 
           <input
@@ -378,12 +378,14 @@ export default function HistoryTripDetailPage() {
           <span className="text-xs font-bold text-red-400">  * </span>
           <div className="flex items-center gap-2">
             <input
-              type="date"
+              type="text"
+              inputMode="numeric"
+              maxLength={10}
               value={tripDetail.startDate}
               onChange={(e) =>
                 setTripDetail({
                   ...tripDetail,
-                  startDate: e.target.value,
+                  startDate: formatDateInput(e.target.value),
                 })
               }
               className="w-full rounded-xl border border-pink-200 px-4 py-3"
@@ -392,12 +394,14 @@ export default function HistoryTripDetailPage() {
             <span className="text-gray-400">~</span>
 
             <input
-              type="date"
+              type="text"
+              inputMode="numeric"
+              maxLength={10}
               value={tripDetail.endDate}
               onChange={(e) =>
                 setTripDetail({
                   ...tripDetail,
-                  endDate: e.target.value,
+                  endDate: formatDateInput(e.target.value),
                 })
               }
               className="w-full rounded-xl border border-pink-200 px-4 py-3"
@@ -483,7 +487,7 @@ export default function HistoryTripDetailPage() {
           />
         </div>
 
-        <div className="mt-6 flex gap-3">
+        <div className="mt-5 flex gap-2">
           <button
             onClick={handleUpdate}
             className="flex-1 rounded-xl bg-pink-500 py-3 text-sm font-bold text-white"
@@ -494,15 +498,15 @@ export default function HistoryTripDetailPage() {
           {tripId !== "new" && canDelete && (
             <button
               onClick={handleDelete}
-              className="flex-1 rounded-xl bg-red-400 py-3 text-sm font-bold text-white"
+              className="rounded-2xl bg-gray-200 px-6 py-3 text-sm font-bold text-gray-700"
             >
               삭제
             </button>
           )}
 
           <button
-            onClick={handleCancel}
-            className="flex-1 rounded-xl bg-gray-200 py-3 text-sm font-bold text-gray-600"
+            onClick={() => router.push("/history-trip")}
+            className="rounded-2xl bg-gray-100 px-6 py-3 text-sm font-bold text-gray-600"
           >
             취소
           </button>

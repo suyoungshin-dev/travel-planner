@@ -111,11 +111,11 @@ export default function HistoryTripPage() {
             여행날짜
           </div>
 
-          <div>등록일</div>
+          <div>최종수정일</div>
 
           {/* 모바일에서는 숨김 */}
           <div className="hidden sm:block">
-            등록자
+            최종수정자
           </div>
         </div>
 
