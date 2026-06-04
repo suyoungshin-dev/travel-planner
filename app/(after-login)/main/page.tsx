@@ -95,9 +95,13 @@ export default function Home() {
     <main className="px-4 py-3">
       {/* 공지사항 */}
       {noticeList.length > 0 && (
-        <section className="mb-4 space-y-2">
+        <section className="mb-4 space-y-1">
           {noticeList.map((notice) => (
-            <Link key={notice.id} href={`/notice/${notice.id}`}>
+            <Link
+              key={notice.id}
+              href={`/notice/${notice.id}`}
+              className="block"   
+            >
               <div className="rounded-xl bg-pink-100 px-4 py-3 text-sm font-medium text-pink-700 shadow-sm hover:bg-pink-200">
                 📢 {notice.title}
               </div>

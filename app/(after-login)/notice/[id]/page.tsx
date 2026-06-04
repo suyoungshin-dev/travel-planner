@@ -215,9 +215,6 @@ export default function NoticeDetailPage() {
     <main className="px-5 py-4">
       <BackButton />
 
-      <p className="mt-2 text-xs text-gray-500">
-        공지사항을 등록하고 관리하는 화면이에요.
-      </p>
 
       <section className="mt-4 rounded-2xl bg-white p-5 shadow-sm">
         <div className="mb-5">
