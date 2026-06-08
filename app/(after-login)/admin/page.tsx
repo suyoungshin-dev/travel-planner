@@ -12,7 +12,9 @@ type User = {
   docId: string; // Firebase 문서 ID
   id: string; // user_id
   nameText: string; // user_name 배열을 콤마 문자열로 변환한 값
-  authYn: "Y" | "N"; // 집행부 여부
+  isLeader: boolean; // 회장
+  isManager: boolean; // 총무
+  isEvent: boolean; // 오락부장
 };
 
 export default function AdminPage() {
@@ -40,7 +42,10 @@ export default function AdminPage() {
             ? data.user_name.join(", ")
             : data.user_name || "",
 
-          authYn: data.auth_yn === "Y" ? "Y" : "N",
+          // Firebase에 값이 없으면 false로 처리
+          isLeader: data.isLeader ?? false,
+          isManager: data.isManager ?? false,
+          isEvent: data.isEvent ?? false,
         };
       });
 
@@ -57,23 +62,51 @@ export default function AdminPage() {
       users.map((user) =>
         user.id === id
           ? {
-            ...user,
-            nameText: value,
-          }
+              ...user,
+              nameText: value,
+            }
           : user
       )
     );
   };
 
-  // 집행부 체크 변경
-  const handleChangeAuth = (id: string) => {
+  // 회장 체크 변경
+  const handleChangeLeader = (id: string) => {
     setUsers(
       users.map((user) =>
         user.id === id
           ? {
-            ...user,
-            authYn: user.authYn === "Y" ? "N" : "Y",
-          }
+              ...user,
+              isLeader: !user.isLeader,
+            }
+          : user
+      )
+    );
+  };
+
+  // 총무 체크 변경
+  const handleChangeManager = (id: string) => {
+    setUsers(
+      users.map((user) =>
+        user.id === id
+          ? {
+              ...user,
+              isManager: !user.isManager,
+            }
+          : user
+      )
+    );
+  };
+
+  // 오락부장 체크 변경
+  const handleChangeEvent = (id: string) => {
+    setUsers(
+      users.map((user) =>
+        user.id === id
+          ? {
+              ...user,
+              isEvent: !user.isEvent,
+            }
           : user
       )
     );
@@ -85,7 +118,8 @@ export default function AdminPage() {
       for (const user of users) {
         const userRef = doc(db, "ele_user", user.docId);
 
-        // 화면 입력값을 Firebase 저장 형식으로 변환 (trim 처리함)
+        // 화면 입력값을 Firebase 저장 형식으로 변환
+        // 예: "창섭, 창섭이" → ["창섭", "창섭이"]
         const nameArray = user.nameText
           .split(",")
           .map((name) => name.trim())
@@ -93,7 +127,9 @@ export default function AdminPage() {
 
         await updateDoc(userRef, {
           user_name: nameArray,
-          auth_yn: user.authYn,
+          isLeader: user.isLeader,
+          isManager: user.isManager,
+          isEvent: user.isEvent,
         });
       }
 
@@ -121,17 +157,19 @@ export default function AdminPage() {
       {/* 사용자 목록 */}
       <section className="mt-4 rounded-2xl bg-white shadow-sm">
         {/* 테이블 헤더 */}
-        <div className="grid grid-cols-[0.9fr_2fr_0.5fr] border-b border-gray-200 px-4 py-3 text-sm font-bold text-gray-500">
+        <div className="grid grid-cols-[0.8fr_1.8fr_0.6fr_0.6fr_0.8fr] border-b border-gray-200 px-4 py-3 text-xs font-bold text-gray-500">
           <div>ID</div>
           <div>이름</div>
-          <div>집행부</div>
+          <div className="text-center">회장</div>
+          <div className="text-center">관리/총무</div>
+          <div className="text-center">오락부장</div>
         </div>
 
         {/* 사용자 목록 */}
         {users.map((user) => (
           <div
             key={user.id}
-            className="grid grid-cols-[0.9fr_2fr_0.5fr] items-center border-b border-gray-100 px-4 py-4 text-sm"
+            className="grid grid-cols-[0.8fr_1.8fr_0.6fr_0.6fr_0.8fr] items-center border-b border-gray-100 px-4 py-4 text-sm"
           >
             {/* 사용자 ID */}
             <div className="text-gray-500">{user.id}</div>
@@ -146,12 +184,32 @@ export default function AdminPage() {
               />
             </div>
 
-            {/* 집행부 여부 */}
-            <div className="pl-3">
+            {/* 회장 여부 */}
+            <div className="text-center">
               <input
                 type="checkbox"
-                checked={user.authYn === "Y"}
-                onChange={() => handleChangeAuth(user.id)}
+                checked={user.isLeader}
+                onChange={() => handleChangeLeader(user.id)}
+                className="h-5 w-5 accent-pink-500"
+              />
+            </div>
+
+            {/* 총무 여부 */}
+            <div className="text-center">
+              <input
+                type="checkbox"
+                checked={user.isManager}
+                onChange={() => handleChangeManager(user.id)}
+                className="h-5 w-5 accent-pink-500"
+              />
+            </div>
+
+            {/* 오락부장 여부 */}
+            <div className="text-center">
+              <input
+                type="checkbox"
+                checked={user.isEvent}
+                onChange={() => handleChangeEvent(user.id)}
                 className="h-5 w-5 accent-pink-500"
               />
             </div>
@@ -161,11 +219,17 @@ export default function AdminPage() {
 
       {/* 저장 / 취소 버튼 */}
       <div className="mt-5 flex justify-end gap-2">
-        <button onClick={handleCancel} className="rounded-xl bg-gray-100 px-5 py-2 font-bold text-gray-500">
+        <button
+          onClick={handleCancel}
+          className="rounded-xl bg-gray-100 px-5 py-2 font-bold text-gray-500"
+        >
           취소
         </button>
 
-        <button onClick={handleSave} className="rounded-xl bg-pink-500 px-5 py-2 font-bold text-white">
+        <button
+          onClick={handleSave}
+          className="rounded-xl bg-pink-500 px-5 py-2 font-bold text-white"
+        >
           저장
         </button>
       </div>

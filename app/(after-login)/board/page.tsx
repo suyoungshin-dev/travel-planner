@@ -32,7 +32,10 @@ type Board = {
 type LoginUser = {
   id: string; // 로그인한 사용자 ID
   name: string; // 로그인한 사용자 이름
-  authYn: "Y" | "N"; // 집행부 여부
+
+  isLeader: boolean; // 회장
+  isManager: boolean; // 총무
+  isEvent: boolean; // 오락부장
 };
 
 export default function BoardPage() {
@@ -44,13 +47,18 @@ export default function BoardPage() {
   const [boards, setBoards] = useState<Board[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
+  
+  const isAdmin =
+    currentUser?.isLeader ||
+    currentUser?.isManager ||
+    currentUser?.isEvent;
+
 
   // 화면 처음 열릴 때 로그인 사용자 정보 + 게시글 목록 조회
   useEffect(() => {
     const isLogin = localStorage.getItem("isLogin");
     const loginUserId = localStorage.getItem("loginUserId");
     const loginUserName = localStorage.getItem("loginUserName");
-    const isAdmin = localStorage.getItem("isAdmin");
 
     if (isLogin !== "Y" || !loginUserId || !loginUserName) {
       alert("로그인이 필요합니다.");
@@ -60,7 +68,10 @@ export default function BoardPage() {
     setCurrentUser({
       id: loginUserId,
       name: loginUserName,
-      authYn: isAdmin === "Y" ? "Y" : "N",
+
+      isLeader: localStorage.getItem("isLeader") === "Y",
+      isManager: localStorage.getItem("isManager") === "Y",
+      isEvent: localStorage.getItem("isEvent") === "Y",
     });
 
     getBoards();
@@ -84,7 +95,7 @@ export default function BoardPage() {
     const q = query(
       collection(db, "ele_board"),
       where("is_deleted", "==", false),
-       orderBy("cr_dt", "desc")
+      orderBy("cr_dt", "desc")
     );
 
     const querySnapshot = await getDocs(q);
@@ -159,7 +170,8 @@ export default function BoardPage() {
   // 집행부용 전체 삭제
   // 실제 삭제가 아니라 is_deleted=true 처리
   const handleDeleteAll = async () => {
-    if (!currentUser || currentUser.authYn !== "Y") return;
+    if (!isAdmin) return;
+    return;
 
     const isOk = confirm("전체 게시글을 삭제할까요?");
     if (!isOk) return;
@@ -202,7 +214,7 @@ export default function BoardPage() {
       <div className="mt-6 flex items-center gap-2">
         <BackButton />
 
-        {currentUser?.authYn === "Y" && (
+        {isAdmin && (
           <button
             onClick={handleDeleteAll}
             className="ml-2 -mt-4 rounded-xl bg-gray-200 px-3 py-2 text-sm font-semibold text-gray-700"

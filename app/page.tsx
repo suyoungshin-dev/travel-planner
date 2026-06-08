@@ -27,7 +27,11 @@ export default function LoginPage() {
       localStorage.setItem("loginUserId", user.user_id);
       //localStorage.setItem("loginUserName", user.user_name[0]);
       localStorage.setItem("loginUserName", inputName);
-      localStorage.setItem("isAdmin", user.auth_yn);
+      //localStorage.setItem("isAdmin", user.auth_yn);
+      localStorage.setItem(
+        "isAdmin",
+        user.isLeader || user.isManager || user.isEvent ? "Y" : "N"
+      );
 
       router.push("/main");
     } else {
