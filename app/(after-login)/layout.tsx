@@ -95,17 +95,19 @@ export default function Layout({
       </div>
 
       {/* footer */}
+      {/* footer */}
       <footer className="border-t border-gray-200 bg-white px-5 py-5 text-sm text-gray-600">
-        <div className="space-y-1">
-          {/* 현재 년도 자동 표시 */}
-          <p className="font-semibold text-pink-700">
-            집행부 정보 ({currentYear})
-          </p>
 
-          {/* 역할별 사용자 자동 표시 */}
-          <p>회장: {leaders || "-"}</p>
-          <p>관리: {managers || "-"}</p>
-          <p>오락부장: {events || "-"}</p>
+        {/* 제목 */}
+        <p className="font-semibold text-pink-700">
+          집행부 정보 ({currentYear})
+        </p>
+
+        {/* 역할 */}
+        <div className="mt-2 flex flex-wrap items-center gap-1 text-sm">
+          <p>회장 {leaders || "-"}</p>
+          <p>· 총무 {managers || "-"}</p>
+          <p>· 오락부장 {events || "-"}</p>
         </div>
 
         {/* 로그아웃 */}
@@ -115,6 +117,7 @@ export default function Layout({
         >
           로그아웃
         </button>
+
       </footer>
     </div>
   );

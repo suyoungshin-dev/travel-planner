@@ -133,23 +133,55 @@ export default function Home() {
       <section className="mb-8">
         {upcomingTrips.length > 0 ? (
           <div className="space-y-4">
-            {upcomingTrips.map((trip) => (
-              <Link key={trip.id} href={`/history-trip/${trip.id}`}>
-                <div className="cursor-pointer rounded-2xl bg-white/70 p-5 shadow-md hover:bg-white">
-                  <p className="text-sm font-semibold text-pink-600">
-                    현재 계획중인 여행
-                  </p>
+            {upcomingTrips.map((trip) => {
 
-                  <h2 className="mt-2 text-2xl font-bold text-gray-800">
-                    {trip.title}
-                  </h2>
+              // 오늘 날짜
+              const today = new Date();
 
-                  <p className="mt-2 text-gray-700">
-                    {trip.startDate} ~ {trip.endDate}
-                  </p>
-                </div>
-              </Link>
-            ))}
+              // 여행 시작일
+              const startDate = new Date(trip.startDate);
+
+              // 날짜 차이 계산
+              const diffTime =
+                startDate.getTime() - today.getTime();
+
+              // D-day 계산
+              const dday = Math.ceil(
+                diffTime / (1000 * 60 * 60 * 24)
+              );
+
+              return (
+                <Link
+                  key={trip.id}
+                  href={`/history-trip/${trip.id}`}
+                >
+                  <div className="cursor-pointer rounded-2xl bg-white/70 p-5 shadow-md hover:bg-white">
+
+                    {/* 상단 영역 */}
+                    <div className="flex items-start justify-between">
+                      <p className="text-sm font-semibold text-pink-600">
+                        현재 계획중인 여행
+                      </p>
+
+                      {/* D-day */}
+                      <div className="rounded-full bg-orange-100 px-3 py-1 text-sm font-bold text-orange-500">
+                        D-{dday}
+                      </div>
+                    </div>
+
+                    {/* 제목 */}
+                    <h2 className="mt-2 text-2xl font-bold text-gray-800">
+                      {trip.title}
+                    </h2>
+
+                    {/* 여행 날짜 */}
+                    <p className="mt-2 text-gray-700">
+                      {trip.startDate} ~ {trip.endDate}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         ) : (
           <div className="rounded-2xl border-2 border-dashed border-pink-50 bg-white/40 p-8 text-center text-gray-400">
@@ -164,7 +196,7 @@ export default function Home() {
           className="bg-pink-500 text-white rounded-2xl font-semibold shadow-md
           w-32 h-32 flex items-center justify-center text-sm text-center"
         >
-          저장된 여행
+          여행
         </Link>
 
         <Link
