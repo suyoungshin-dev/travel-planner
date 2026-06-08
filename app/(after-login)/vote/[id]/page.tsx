@@ -1,170 +1,427 @@
 "use client";
 
-import { use } from "react";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import BackButton from "@/app/components/BackButton";
+
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
+  Timestamp,
+} from "firebase/firestore";
+import { db } from "@/app/lib/firebase";
+
+type LoginUser = {
+  id: string;
+  name: string;
+  isLeader: boolean;
+  isManager: boolean;
+  isEvent: boolean;
+};
+
+type VoteOption = {
+  id: string;
+  text: string;
+};
+
+type VoteUser = {
+  userId: string;
+  userName: string;
+  optionIds: string[];
+  votedAt?: Timestamp;
+};
 
 type Vote = {
   id: string;
   title: string;
-  status: string;
-  startDate: string;
-  endDate: string;
-  isAnonymous: boolean;
+  startDT: string;
+  endDT: string;
+  status: "active" | "done";
 
-  // 작성/수정 사용자 정보
-  crID?: string;
-  crName?: string;
+  isAnonymous: boolean;
+  isMultiple: boolean;
+  allowAddOption: boolean;
+  isExecutiveOnly: boolean;
+
+  options: VoteOption[];
+  voters: VoteUser[];
+
+  crID: string;
+  crName: string;
+  crDT?: Timestamp;
+
   modID?: string;
   modName?: string;
+  modDT?: Timestamp;
 
-  options: {
-    id: string;
-    text: string;
-    count: number;
-  }[];
+  is_deleted: boolean;
 };
 
-// 임시 투표 데이터
-const votes: Vote[] = [
-  {
-    id: "3",
-    title: "단체티",
-    status: "done",
-    startDate: "2026-05-01",
-    endDate: "2026-05-10",
-    isAnonymous: true,
-    crID: "user_007",
-    crName: "수영",
-    modID: "user_007",
-    modName: "수영",
-    options: [
-      { id: "1", text: "한다", count: 5 },
-      { id: "2", text: "안 한다", count: 2 },
-    ],
-  },
-  {
-    id: "4",
-    title: "저녁 메뉴",
-    status: "done",
-    startDate: "2026-05-01",
-    endDate: "2026-05-10",
-    isAnonymous: false,
-    crID: "user_008",
-    crName: "아영",
-    modID: "user_008",
-    modName: "아영",
-    options: [
-      { id: "1", text: "돼지", count: 4 },
-      { id: "2", text: "소", count: 4 },
-      { id: "3", text: "회", count: 1 },
-    ],
-  },
-];
+export default function VoteDetailPage() {
+  const router = useRouter();
+  const params = useParams();
 
-export default function VoteDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
+  // URL의 [id] 값
+  const voteId = params.id as string;
 
   // 로그인 사용자 정보
-  const loginUserId = localStorage.getItem("loginUserId") ?? "";
-  const loginUserName = localStorage.getItem("loginUserName") ?? "";
-  const isAdmin = localStorage.getItem("isAdmin") === "Y";
+  const [currentUser, setCurrentUser] = useState<LoginUser | null>(null);
 
-  // ID에 맞는 투표 찾기
-  const vote = votes.find((vote) => vote.id === id);
+  // Firebase에서 가져온 투표 정보
+  const [vote, setVote] = useState<Vote | null>(null);
 
-  if (!vote) {
+  // 화면 로딩 상태
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 사용자가 현재 화면에서 선택한 투표 항목들
+  const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([]);
+
+  // 화면 최초 진입 시 실행
+  useEffect(() => {
+    const getPageData = async () => {
+      const isLogin = localStorage.getItem("isLogin");
+      const loginUserId = localStorage.getItem("loginUserId");
+      const loginUserName = localStorage.getItem("loginUserName");
+
+      if (isLogin !== "Y" || !loginUserId || !loginUserName) {
+        alert("로그인이 필요합니다.");
+        router.push("/");
+        return;
+      }
+
+      const userInfo: LoginUser = {
+        id: loginUserId,
+        name: loginUserName,
+        isLeader: localStorage.getItem("isLeader") === "Y",
+        isManager: localStorage.getItem("isManager") === "Y",
+        isEvent: localStorage.getItem("isEvent") === "Y",
+      };
+
+      setCurrentUser(userInfo);
+
+      // Firebase에서 현재 투표 상세 조회
+      const voteRef = doc(db, "ele_vote", voteId);
+      const voteSnap = await getDoc(voteRef);
+
+      if (!voteSnap.exists()) {
+        setVote(null);
+        setIsLoading(false);
+        return;
+      }
+
+      const data = voteSnap.data();
+
+      const voteData: Vote = {
+        id: voteSnap.id,
+        title: data.title ?? "",
+        startDT: data.startDT ?? "",
+        endDT: data.endDT ?? "",
+        status: data.status ?? "active",
+
+        isAnonymous: data.isAnonymous ?? false,
+        isMultiple: data.isMultiple ?? false,
+        allowAddOption: data.allowAddOption ?? false,
+        isExecutiveOnly: data.isExecutiveOnly ?? false,
+
+        options: data.options ?? [],
+        voters: data.voters ?? [],
+
+        crID: data.crID ?? "",
+        crName: data.crName ?? "",
+        crDT: data.crDT ?? null,
+
+        modID: data.modID ?? "",
+        modName: data.modName ?? "",
+        modDT: data.modDT ?? null,
+
+        is_deleted: data.is_deleted ?? false,
+      };
+
+      setVote(voteData);
+
+      // 이미 내가 투표한 내역이 있으면 화면에도 체크 표시
+      const myVote = voteData.voters.find(
+        (voter) => voter.userId === userInfo.id
+      );
+
+      setSelectedOptionIds(myVote?.optionIds ?? []);
+      setIsLoading(false);
+    };
+
+    getPageData();
+  }, [router, voteId]);
+
+  // 투표 항목 클릭 이벤트
+  const handleSelectOption = (optionId: string) => {
+    if (!vote) return;
+
+    // 복수 선택 가능일 때
+    if (vote.isMultiple) {
+      if (selectedOptionIds.includes(optionId)) {
+        setSelectedOptionIds(
+          selectedOptionIds.filter((id) => id !== optionId)
+        );
+      } else {
+        setSelectedOptionIds([...selectedOptionIds, optionId]);
+      }
+
+      return;
+    }
+
+    // 단일 선택일 때
+    setSelectedOptionIds([optionId]);
+  };
+
+  // 투표 저장
+  const handleVote = async () => {
+    if (!vote || !currentUser) return;
+
+    if (vote.status === "done") {
+      alert("이미 완료된 투표입니다.");
+      return;
+    }
+
+    if (selectedOptionIds.length === 0) {
+      alert("투표 항목을 선택해주세요.");
+      return;
+    }
+
+    const newVoters = [
+      // 기존 내 투표는 제거
+      ...vote.voters.filter((voter) => voter.userId !== currentUser.id),
+
+      // 새로 선택한 투표 저장
+      {
+        userId: currentUser.id,
+        userName: currentUser.name,
+        optionIds: selectedOptionIds,
+        votedAt: Timestamp.now(),
+      },
+    ];
+
+    await updateDoc(doc(db, "ele_vote", vote.id), {
+      voters: newVoters,
+      modID: currentUser.id,
+      modName: currentUser.name,
+      modDT: serverTimestamp(),
+    });
+
+    setVote({
+      ...vote,
+      voters: newVoters,
+      modID: currentUser.id,
+      modName: currentUser.name,
+    });
+
+    alert("투표가 저장되었습니다.");
+  };
+
+  // 투표 완료 처리
+  const handleDone = async () => {
+    if (!vote || !currentUser) return;
+
+    if (!confirm("투표를 완료 처리할까요? 완료 후에는 기록 보기만 가능합니다.")) {
+      return;
+    }
+
+    await updateDoc(doc(db, "ele_vote", vote.id), {
+      status: "done",
+      modID: currentUser.id,
+      modName: currentUser.name,
+      modDT: serverTimestamp(),
+    });
+
+    setVote({
+      ...vote,
+      status: "done",
+      modID: currentUser.id,
+      modName: currentUser.name,
+    });
+
+    alert("투표가 완료 처리되었습니다.");
+  };
+
+  // 투표 삭제
+  const handleDelete = async () => {
+    if (!vote) return;
+
+    const isConfirm = confirm("투표를 삭제할까요?");
+
+    if (!isConfirm) return;
+
+    // 실제 삭제
+    await deleteDoc(doc(db, "ele_vote", vote.id));
+
+    alert("삭제되었습니다.");
+
+    router.push("/vote");
+  };
+
+  // 항목별 득표 수 계산
+  const getOptionCount = (optionId: string) => {
+    if (!vote) return 0;
+
+    return vote.voters.filter((voter) => voter.optionIds.includes(optionId))
+      .length;
+  };
+
+  // 항목별 투표자 이름 목록
+  const getOptionVoterNames = (optionId: string) => {
+    if (!vote) return [];
+
+    return vote.voters
+      .filter((voter) => voter.optionIds.includes(optionId))
+      .map((voter) => voter.userName);
+  };
+
+  if (isLoading) {
     return (
       <main className="px-4 py-3">
         <BackButton />
-        <p className="text-gray-500">만드는 중! 데헷</p>
+        <p className="mt-6 text-sm text-gray-500">불러오는 중...</p>
       </main>
     );
   }
 
-  // 집행부거나 작성자면 수정/삭제 가능  ** 추후 수정
-  //const canEdit = isAdmin || vote.crID === loginUserId;
+  if (!vote || vote.is_deleted) {
+    return (
+      <main className="px-4 py-3">
+        <BackButton />
+        <p className="mt-6 text-sm text-gray-500">투표를 찾을 수 없습니다.</p>
+      </main>
+    );
+  }
 
-  // 전체 투표 수
-  const totalCount = vote.options.reduce(
-    (sum, option) => sum + option.count,
+  if (!currentUser) return null;
+
+  // 내가 만든 투표인지
+  const isOwner = vote.crID === currentUser.id;
+
+  // 투표 완료 여부
+  const isDone = vote.status === "done";
+
+  // 내가 이미 투표했는지
+  const myVote = vote.voters.find((voter) => voter.userId === currentUser.id);
+  const isVoted = !!myVote;
+
+  // 전체 참여자 수
+  const totalVoterCount = vote.voters.length;
+
+  // 복수선택이면 총 표 수와 참여자 수가 다를 수 있음
+  const totalVoteCount = vote.options.reduce(
+    (sum, option) => sum + getOptionCount(option.id),
     0
   );
 
   // 최고 득표 수
-  const maxCount = Math.max(...vote.options.map((option) => option.count));
-
-  // 나중에 DB 저장할 때 사용할 기본 데이터
-  /*
-  const saveBaseData = {
-    crID: loginUserId,
-    crName: loginUserName,
-    modID: loginUserId,
-    modName: loginUserName,
-  };
-  */
+  const maxCount = Math.max(
+    0,
+    ...vote.options.map((option) => getOptionCount(option.id))
+  );
 
   return (
     <main className="px-4 py-3">
       <BackButton />
 
-      <div className="mb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">{vote.title}</h1>
+      <div className="mb-2 flex items-start justify-between gap-3">
+        <div className="mb-5">
+          <h1 className="text-xl font-extrabold text-gray-900">{vote.title}</h1>
 
-        
-        {/*canEdit && (
-          <button className="rounded-lg bg-gray-200 px-3 py-1 text-sm font-bold text-gray-700">
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-gray-500">
+            <span>{vote.startDT}</span>
+            <span>~</span>
+            <span>{vote.endDT}</span>
+
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-bold ${isDone
+                ? "bg-gray-100 text-gray-500"
+                : "bg-pink-100 text-pink-600"
+                }`}
+            >
+              {isDone ? "완료" : "진행중"}
+            </span>
+          </div>
+
+          <p className="mt-1 text-xs text-gray-400">등록자: {vote.crName}</p>
+        </div>
+
+        {isOwner && !isDone && (
+          <button
+            onClick={() => router.push(`/vote/new?id=${vote.id}`)}
+            className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600"
+          >
             수정
           </button>
-        )*/}
+        )}
       </div>
 
-      <p className="mb-6 text-sm text-gray-500">
-        {vote.startDate} ~ {vote.endDate}
-      </p>
+      <div className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          <p className="text-base font-extrabold text-gray-800">
+            {isDone ? "투표 결과" : "투표하기"}
+          </p>
 
-      <div className="mb-4 rounded-2xl bg-white/70 p-5 shadow-md">
-        <p className="font-bold text-gray-800">투표 결과</p>
+          <p className="text-sm font-bold text-pink-500">
+            참여 {totalVoterCount}명
+          </p>
+        </div>
 
-        <p className="mt-1 text-sm text-gray-500">
-          총 {totalCount}표 {vote.isAnonymous ? "· 익명투표" : ""}
-        </p>
+        <div className="mt-2 flex flex-wrap gap-1 text-xs text-gray-400">
+          {vote.isAnonymous && <span>익명투표</span>}
+          {vote.isMultiple && <span>복수선택 가능</span>}
+          {vote.isMultiple && <span>총 {totalVoteCount}표</span>}
+        </div>
+
+        {!isDone && isVoted && (
+          <p className="mt-3 rounded-xl bg-pink-50 px-3 py-2 text-xs font-medium text-pink-500">
+            이미 투표했어요. 다시 선택 후 저장하면 변경됩니다.
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-3">
         {vote.options.map((option) => {
-          // 득표율 계산
-          const percent =
-            totalCount === 0
-              ? 0
-              : Math.round((option.count / totalCount) * 100);
+          const count = getOptionCount(option.id);
 
-          // 최고 득표 여부
-          const isWinner = option.count === maxCount;
+          const percent =
+            totalVoteCount === 0
+              ? 0
+              : Math.round((count / totalVoteCount) * 100);
+
+          const isSelected = selectedOptionIds.includes(option.id);
+          const isWinner = isDone && count > 0 && count === maxCount;
+          const voterNames = getOptionVoterNames(option.id);
 
           return (
-            <div
+            <button
               key={option.id}
-              className="rounded-2xl bg-white/70 p-5 shadow-md"
+              onClick={() => !isDone && handleSelectOption(option.id)}
+              disabled={isDone}
+              className={`rounded-2xl p-4 text-left shadow-sm transition ${isSelected && !isDone
+                ? "bg-pink-50 ring-2 ring-pink-300"
+                : "bg-white"
+                }`}
             >
-              <div className="flex justify-between gap-3">
-                <p className="font-bold text-gray-800">{option.text}</p>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <p className="text-base font-extrabold text-gray-800">
+                  {isSelected && !isDone && (
+                    <span className="mr-1 text-pink-500">✓</span>
+                  )}
+                  {option.text}
+                </p>
 
                 <p
-                  className={`text-sm font-semibold ${isWinner ? "text-pink-600" : "text-gray-500"
+                  className={`shrink-0 text-sm font-extrabold ${isWinner ? "text-pink-600" : "text-gray-500"
                     }`}
                 >
-                  {option.count}표
+                  {count}표
                 </p>
               </div>
 
-              <div
-                className={`mt-3 h-3 overflow-hidden rounded-full ${isWinner ? "bg-pink-100" : "bg-gray-200"
-                  }`}
-              >
+              <div className="h-2.5 overflow-hidden rounded-full bg-gray-200">
                 <div
                   className={`h-full rounded-full ${isWinner ? "bg-pink-500" : "bg-gray-400"
                     }`}
@@ -172,13 +429,56 @@ export default function VoteDetailPage({
                 />
               </div>
 
-              <p className="mt-2 text-right text-sm text-gray-500">
-                {percent}%
-              </p>
-            </div>
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <div className="min-h-5">
+                  {!vote.isAnonymous && isVoted && voterNames.length > 0 && (
+                    <p className="text-xs text-gray-400">
+                      {voterNames.join(", ")}
+                    </p>
+                  )}
+
+                  {vote.isAnonymous && isVoted && count > 0 && (
+                    <p className="text-xs text-gray-400">
+                      {count}명이 선택했어요.
+                    </p>
+                  )}
+                </div>
+
+                <p className="text-xs font-bold text-gray-400">{percent}%</p>
+              </div>
+            </button>
           );
         })}
       </div>
+
+      {!isDone && (
+        <div className="mt-6 flex gap-2">
+          {isOwner && (
+            <button
+              onClick={handleDone}
+              className="flex-1 rounded-xl bg-gray-100 px-5 py-3 font-bold text-gray-500"
+            >
+              완료
+            </button>
+          )}
+
+          <button
+            onClick={handleVote}
+            className="flex-1 rounded-xl bg-pink-500 px-5 py-3 font-bold text-white"
+          >
+            {isVoted ? "투표 수정" : "투표하기"}
+          </button>
+
+          {isOwner && (
+            <button
+              onClick={handleDelete}
+              className="rounded-xl bg-red-50 px-5 py-3 font-bold text-red-500"
+            >
+              삭제
+            </button>
+          )}
+        </div>
+      )}
     </main>
   );
 }

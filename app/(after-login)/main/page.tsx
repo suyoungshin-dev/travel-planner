@@ -8,6 +8,7 @@ import {
   collection,
   getDocs,
   query,
+  where,
   orderBy,
 } from "firebase/firestore";
 
@@ -27,7 +28,7 @@ type Notice = {
 };
 
 export default function Home() {
-  const activeVoteCount = 2;
+  const [activeVoteCount, setActiveVoteCount] = useState(0);   // 투표 건 수 가져오기
 
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
   const [noticeList, setNoticeList] = useState<Notice[]>([]);
@@ -65,10 +66,7 @@ export default function Home() {
 
     const getNotices = async () => {
       const querySnapshot = await getDocs(
-        query(
-          collection(db, "ele_notice"),
-          orderBy("modDT", "desc")
-        )
+        query(collection(db, "ele_notice"), orderBy("modDT", "desc"))
       );
 
       const notices: Notice[] = querySnapshot.docs
@@ -81,14 +79,35 @@ export default function Home() {
             isNotice: data.isNotice ?? false,
           };
         })
-        // 공지 체크된 것만
         .filter((notice) => notice.isNotice);
 
       setNoticeList(notices);
     };
 
+    // 진행중 투표 개수 조회
+    const getVoteCount = async () => {
+      const today = new Date().toISOString().slice(0, 10);
+
+      const voteQuery = query(
+        collection(db, "ele_vote"),
+        where("status", "==", "active"),
+        where("is_deleted", "==", false)
+      );
+
+      const querySnapshot = await getDocs(voteQuery);
+
+      const activeVotes = querySnapshot.docs.filter((docItem) => {
+        const data = docItem.data();
+
+        return data.endDT >= today;
+      });
+
+      setActiveVoteCount(activeVotes.length);
+    };
+
     getTrips();
     getNotices();
+    getVoteCount();
   }, []);
 
   return (
@@ -100,7 +119,7 @@ export default function Home() {
             <Link
               key={notice.id}
               href={`/notice/${notice.id}`}
-              className="block"   
+              className="block"
             >
               <div className="rounded-xl bg-pink-100 px-4 py-3 text-sm font-medium text-pink-700 shadow-sm hover:bg-pink-200">
                 📢 {notice.title}
