@@ -125,21 +125,19 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="px-7 pt-1">
-      {/* 안내 문구 */}
-      <p className="mt-6 text-gray-800">
-        입장 코드와 이름을 입력해주세요!
-      </p>
+    <main className="px-7 pt-10">
+      <div className="mt-[120px]">
+        {/* 안내 문구 */}
+        <h1 className="text-[24px] font-semibold leading-[140%]">
+          코드와 이름을 입력해주세요!
+        </h1>
+      </div>
 
       {/* 코드 입력 */}
       <div className="mt-6 flex items-center gap-3">
-        <label className="w-20 text-sm font-bold text-gray-700">
-          코드
-        </label>
-
         <input
           type="password"
-          className="w-full max-w-xs rounded-xl border border-pink-50 px-4 py-2 outline-none"
+          className="w-[326px] border-b-2 border-[#1C70D7] py-2 text-lg outline-none"
           value={code}
           maxLength={10}
           placeholder="코드를 입력하세요."
@@ -156,12 +154,13 @@ export default function LoginPage() {
 
       {/* 이름 입력 */}
       <div className="mt-4 flex items-center gap-3">
-        <label className="w-20 text-sm font-bold text-gray-700">
+        {/* <label className="w-20 text-sm font-bold text-gray-700">
           이름
-        </label>
+        </label> */}
 
         <input
-          className="w-full max-w-xs rounded-xl border border-pink-50 px-4 py-3 outline-none"
+          //className="w-full max-w-xs rounded-xl border border-pink-50 px-4 py-3 outline-none"
+          className="w-[326px] border-b-2 border-[#1C70D7] py-2 text-lg outline-none"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="이름 두글자를 입력하세요. (예: 창섭)"
@@ -175,7 +174,7 @@ export default function LoginPage() {
       <button
         onClick={handleLogin}
         disabled={loading}
-        className="mt-5 block rounded-2xl bg-pink-500 px-8 py-4 font-bold text-white shadow-md disabled:bg-gray-300"
+        className="mt-5 block rounded-2xl bg-[#1C70D7] px-8 py-4 font-bold text-white shadow-md disabled:bg-gray-300"
       >
         {loading ? "확인중..." : "입장하기"}
       </button>

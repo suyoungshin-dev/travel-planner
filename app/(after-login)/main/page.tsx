@@ -111,20 +111,28 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="px-4 py-3">
+    <main className="px-5 py-4">
       {/* 공지사항 */}
       {noticeList.length > 0 && (
         <section className="mb-4 space-y-1">
           {noticeList.map((notice) => (
-            <Link
+            <div
               key={notice.id}
-              href={`/notice/${notice.id}`}
-              className="block"
+              className="flex items-center justify-between rounded-xl bg-pink-100 px-4 py-3 shadow-sm"
             >
-              <div className="rounded-xl bg-pink-100 px-4 py-3 text-sm font-medium text-pink-700 shadow-sm hover:bg-pink-200">
+              {/* 공지 제목 */}
+              <p className="text-sm font-medium text-pink-700">
                 📢 {notice.title}
-              </div>
-            </Link>
+              </p>
+
+              {/* 공지 보러가기 버튼 */}
+              <Link
+                href={`/notice/${notice.id}`}
+                className="text-sm font-semibold text-pink-700" //text-[#1C70D7]
+              >
+                공지보기 &gt;
+              </Link>
+            </div>
           ))}
         </section>
       )}
@@ -154,8 +162,9 @@ export default function Home() {
                 <Link
                   key={trip.id}
                   href={`/history-trip/${trip.id}`}
+                  className="block"
                 >
-                  <div className="cursor-pointer rounded-2xl bg-white/70 p-5 shadow-md hover:bg-white">
+                  <div className="cursor-pointer rounded-2xl bg-white p-6 shadow-md hover:bg-gray-50">
 
                     {/* 상단 영역 */}
                     <div className="flex items-start justify-between">

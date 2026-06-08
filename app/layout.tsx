@@ -15,8 +15,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="bg-gradient-to-b from-pink-100 to-violet-100 min-h-screen">
-        <div className="min-h-screen flex flex-col">
-          <HeaderWrapper />
+        <div className="min-h-screen flex flex-col">         
 
           <div className="flex-1">
             {children}

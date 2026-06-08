@@ -88,37 +88,69 @@ export default function Layout({
     .join(", ");
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* 본문 */}
-      <div className="flex-1 w-full max-w-2xl">
-        {children}
-      </div>
+    /**
+     * 전체 화면 영역
+     * min-h-screen : 화면 최소 높이를 브라우저 전체 높이로 설정
+     * bg-gray-100 : 앱 바깥쪽 회색 배경
+     */
+    <div className="min-h-screen bg-gray-100">
 
-      {/* footer */}
-      {/* footer */}
-      <footer className="border-t border-gray-200 bg-white px-5 py-5 text-sm text-gray-600">
-
-        {/* 제목 */}
-        <p className="font-semibold text-pink-700">
-          집행부 정보 ({currentYear})
-        </p>
-
-        {/* 역할 */}
-        <div className="mt-2 flex flex-wrap items-center gap-1 text-sm">
-          <p>회장 {leaders || "-"}</p>
-          <p>· 총무 {managers || "-"}</p>
-          <p>· 오락부장 {events || "-"}</p>
+      {/*
+      실제 앱 화면 영역
+      mx-auto       : 가운데 정렬
+      max-w-[430px] : 최대 너비를 430px로 제한 (아이폰 느낌)
+      flex-col      : 세로 배치
+      bg-white      : 앱 내부 흰색 배경
+      shadow-sm     : 살짝 그림자
+    */}
+      <div className="mx-auto flex min-h-screen max-w-[430px] flex-col bg-white shadow-sm">
+        {/* 공통 헤더 */}
+        <Header />
+        {/*
+        본문 영역
+        flex-1 : footer 제외한 나머지 높이 전부 사용
+      */}
+        <div className="flex-1">
+          {children}
         </div>
 
-        {/* 로그아웃 */}
-        <button
-          onClick={handleLogout}
-          className="mt-4 text-xs text-gray-400 transition hover:text-gray-600"
-        >
-          로그아웃
-        </button>
+        {/*
+        footer 영역
+      */}
+        <footer className="border-t border-gray-200 bg-white px-5 py-5 text-sm text-gray-600">
 
-      </footer>
+          {/* footer 제목 */}
+          <p className="font-semibold text-[#1C70D7]">
+            집행부 정보 ({currentYear})
+          </p>
+
+          {/*
+          역할 목록
+          flex-wrap : 화면 좁아지면 자동 줄바꿈
+          gap-1     : 요소 사이 간격
+        */}
+          <div className="mt-2 flex flex-wrap items-center gap-1 text-sm">
+
+            {/* 회장 */}
+            <p>회장 {leaders || "-"}</p>
+
+            {/* 총무 */}
+            <p>· 총무 {managers || "-"}</p>
+
+            {/* 오락부장 */}
+            <p>· 오락부장 {events || "-"}</p>
+          </div>
+
+          {/* 로그아웃 버튼 */}
+          <button
+            onClick={handleLogout}
+            className="mt-4 text-xs text-gray-400 transition hover:text-gray-600"
+          >
+            로그아웃
+          </button>
+
+        </footer>
+      </div>
     </div>
   );
 }

@@ -53,36 +53,44 @@ export default function Header() {
   };
 
   return (
-    <header className="mb-0 flex items-center gap-3 px-5 pt-4">
-      <div className="flex items-end gap-2">
+    <header className="px-5 pt-4">
+      {/* 1줄: 로고 / 로그인 사용자 / 관리 버튼 */}
+      <div className="flex w-full items-end justify-between">
         <h1
           onClick={handleHomeClick}
-          className="cursor-pointer text-4xl font-bold text-pink-900"
+          className="cursor-pointer text-4xl font-bold text-[#1C70D7]"
         >
           11-1=0 ✈️
         </h1>
 
-        {!isLoginPage && userName && (
-          <span className="pb-1 text-sm font-bold text-gray-500">
-            👤 {userName}
+        {!isLoginPage && (
+          <div className="flex items-center gap-2 pb-1">
+            {userName && (
+              <span className="text-sm font-bold text-gray-500">
+                👤 {userName}
+              </span>
+            )}
+
+            {isAdmin && pathname !== "/admin" && (
+              <button
+                onClick={() => router.push("/admin")}
+                className="rounded-lg bg-gray-200 px-3 py-1 text-sm font-bold text-gray-700"
+              >
+                관리
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 2줄: 페이지 제목 */}
+      {getTitle() && (
+        <div className="mt-3">
+          <span className="text-xl font-bold text-pink-500">
+            {getTitle()}
           </span>
-        )}
-      </div>
-
-      <div className="flex items-end gap-2">
-        {getTitle() && (
-          <span className="text-xl font-bold text-pink-500">{getTitle()}</span>
-        )}
-
-        {!isLoginPage && isAdmin && pathname !== "/admin" && (
-          <button
-            onClick={() => router.push("/admin")}
-            className="ml-1 rounded-lg bg-gray-200 px-3 py-1 text-sm font-bold text-gray-700"
-          >
-            관리
-          </button>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 }
