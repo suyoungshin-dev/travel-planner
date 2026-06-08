@@ -40,12 +40,12 @@ export default function NoticeDetailPage() {
       ? localStorage.getItem("loginUserId") ?? ""
       : "";
 
+  const isWriter = loginUserId === noticeDetail?.createdId;
+
   const loginUserName =
     typeof window !== "undefined"
       ? localStorage.getItem("loginUserName") ?? ""
       : "";
-
-  const canDelete = noticeDetail?.createdId === loginUserId;
 
   const formatDateTime = (value: any) => {
     if (!value?.toDate) return "";
@@ -159,6 +159,11 @@ export default function NoticeDetailPage() {
       return;
     }
 
+    if (!isWriter) {
+      alert("작성자만 수정할 수 있어요.");
+      return;
+    }
+
     await updateDoc(doc(db, "ele_notice", noticeId), {
       title: noticeDetail.title,
       comment: noticeDetail.comment,
@@ -226,6 +231,7 @@ export default function NoticeDetailPage() {
               <input
                 type="checkbox"
                 checked={noticeDetail.isNotice}
+                disabled={!isWriter && noticeId !== "new"}
                 onChange={(e) =>
                   setNoticeDetail({
                     ...noticeDetail,
@@ -239,13 +245,17 @@ export default function NoticeDetailPage() {
 
           <input
             value={noticeDetail.title}
+            readOnly={!isWriter && noticeId !== "new"}
             onChange={(e) =>
               setNoticeDetail({
                 ...noticeDetail,
                 title: e.target.value,
               })
             }
-            className="w-full rounded-xl border border-pink-200 px-4 py-3"
+            className={`w-full rounded-xl border border-pink-200 px-4 py-3 ${!isWriter && noticeId !== "new"
+              ? "bg-gray-100 text-gray-500"
+              : "bg-white"
+              }`}
           />
         </div>
 
@@ -254,25 +264,31 @@ export default function NoticeDetailPage() {
 
           <textarea
             value={noticeDetail.comment}
+            readOnly={!isWriter && noticeId !== "new"}
             onChange={(e) =>
               setNoticeDetail({
                 ...noticeDetail,
                 comment: e.target.value,
               })
             }
-            className="h-64 w-full resize-none rounded-xl border border-pink-200 px-4 py-3"
+            className={`h-64 w-full resize-none rounded-xl border border-pink-200 px-4 py-3 ${!isWriter && noticeId !== "new"
+                ? "bg-gray-100 text-gray-500"
+                : "bg-white"
+              }`}
           />
         </div>
 
         <div className="mt-6 flex gap-3">
-          <button
-            onClick={handleUpdate}
-            className="flex-1 rounded-xl bg-pink-500 py-3 text-sm font-bold text-white"
-          >
-            {noticeId === "new" ? "추가" : "저장"}
-          </button>
+          {(noticeId === "new" || isWriter) && (
+            <button
+              onClick={handleUpdate}
+              className="flex-1 rounded-xl bg-pink-500 py-3 text-sm font-bold text-white"
+            >
+              {noticeId === "new" ? "추가" : "저장"}
+            </button>
+          )}
 
-          {noticeId !== "new" && canDelete && (
+          {noticeId !== "new" && isWriter && (
             <button
               onClick={handleDelete}
               className="flex-1 rounded-xl bg-red-400 py-3 text-sm font-bold text-white"
@@ -281,12 +297,14 @@ export default function NoticeDetailPage() {
             </button>
           )}
 
-          <button
-            onClick={handleCancel}
-            className="flex-1 rounded-xl bg-gray-200 py-3 text-sm font-bold text-gray-600"
-          >
-            취소
-          </button>
+          {noticeId !== "new" && isWriter && (
+            <button
+              onClick={handleDelete}
+              className="flex-1 rounded-xl bg-red-400 py-3 text-sm font-bold text-white"
+            >
+              취소
+            </button>
+          )}
         </div>
 
         <hr className="my-5 border-gray-200" />
@@ -295,11 +313,6 @@ export default function NoticeDetailPage() {
           <div>
             <span className="font-bold text-gray-500">최종수정일시 : </span>
             {noticeDetail.modifiedAt}
-          </div>
-
-          <div>
-            <span className="font-bold text-gray-500">최종수정자 : </span>
-            {noticeDetail.modifiedName}
           </div>
 
           <div>

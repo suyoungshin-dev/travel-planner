@@ -113,7 +113,7 @@ export default function NoticePage() {
 
             {/* 설명 문구 */}
             <p className="mt-2 text-xs text-gray-500">
-                공지사항이에요
+                공지사항이에요! 누구나 등록할 수 있답니다~
             </p>
 
             {/* 게시판 영역 */}

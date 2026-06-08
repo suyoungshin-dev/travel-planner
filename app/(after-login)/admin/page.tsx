@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import BackButton from "@/app/components/BackButton";
+import { useRouter } from "next/navigation";
 
 // Firebase
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
@@ -23,6 +24,8 @@ export default function AdminPage() {
 
   // 취소 버튼 눌렀을 때 되돌릴 원본 데이터
   const [originalUsers, setOriginalUsers] = useState<User[]>([]);
+
+  const router = useRouter();
 
   // 화면 최초 진입 시 Firebase 사용자 목록 조회
   useEffect(() => {
@@ -62,9 +65,9 @@ export default function AdminPage() {
       users.map((user) =>
         user.id === id
           ? {
-              ...user,
-              nameText: value,
-            }
+            ...user,
+            nameText: value,
+          }
           : user
       )
     );
@@ -76,9 +79,9 @@ export default function AdminPage() {
       users.map((user) =>
         user.id === id
           ? {
-              ...user,
-              isLeader: !user.isLeader,
-            }
+            ...user,
+            isLeader: !user.isLeader,
+          }
           : user
       )
     );
@@ -90,9 +93,9 @@ export default function AdminPage() {
       users.map((user) =>
         user.id === id
           ? {
-              ...user,
-              isManager: !user.isManager,
-            }
+            ...user,
+            isManager: !user.isManager,
+          }
           : user
       )
     );
@@ -104,9 +107,9 @@ export default function AdminPage() {
       users.map((user) =>
         user.id === id
           ? {
-              ...user,
-              isEvent: !user.isEvent,
-            }
+            ...user,
+            isEvent: !user.isEvent,
+          }
           : user
       )
     );
@@ -154,6 +157,15 @@ export default function AdminPage() {
       {/* 뒤로가기 + 안내문구 */}
       <BackButton message="사용자 정보와 집행부 권한을 관리합니다." />
 
+      <div className="mt-6 flex justify-end">
+        <button
+          onClick={() => router.push("/admin/code")}
+          className="rounded-xl bg-pink-100 px-4 py-2 text-sm font-bold text-pink-600 hover:bg-pink-200"
+        >
+          코드 관리
+        </button>
+      </div>
+
       {/* 사용자 목록 */}
       <section className="mt-4 rounded-2xl bg-white shadow-sm">
         {/* 테이블 헤더 */}
@@ -161,7 +173,7 @@ export default function AdminPage() {
           <div>ID</div>
           <div>이름</div>
           <div className="text-center">회장</div>
-          <div className="text-center">관리/총무</div>
+          <div className="text-center">관리</div>
           <div className="text-center">오락부장</div>
         </div>
 

@@ -350,7 +350,7 @@ export default function HistoryTripDetailPage() {
       <BackButton />
 
       <p className="mt-2 text-xs text-gray-500">
-        여행가즈아~~
+        여행 궁금해요? 여길 보세요
       </p>
 
       <section className="mt-4 rounded-2xl bg-white p-5 shadow-sm">

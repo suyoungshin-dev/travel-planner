@@ -95,7 +95,7 @@ export default function HistoryTripPage() {
 
       {/* 설명 문구 */}
       <p className="mt-2 text-xs text-gray-500">
-        여행가자
+        추가와 수정이 자유로운 여행 게시판!
       </p>
 
       {/* 게시판 영역 */}

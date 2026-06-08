@@ -34,7 +34,7 @@ export default function Header() {
       return "다가오는 여행";
     }
 
-    if (pathname.includes("/history-trip")) return "여행 저장";
+    if (pathname.includes("/history-trip")) return "여행목록";
     if (pathname.includes("/board")) return "한줄대화";
     if (pathname.includes("/admin")) return "관리";
     if (pathname.includes("/main")) return "";

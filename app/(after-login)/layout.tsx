@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 
+import { useRouter } from "next/navigation";
 import Header from "../components/Header";
+
 import { db } from "@/app/lib/firebase";
 
 // footer에 사용할 사용자 타입
@@ -24,6 +26,9 @@ export default function Layout({
 
   // 현재 년도
   const currentYear = new Date().getFullYear();
+
+  // 페이지 이동용
+  const router = useRouter();
 
   // 화면 진입 시 사용자 조회
   useEffect(() => {
@@ -50,6 +55,21 @@ export default function Layout({
 
     getUsers();
   }, []);
+
+  /**
+ * 로그아웃
+ * localStorage 제거 후 로그인 화면 이동
+ */
+  const handleLogout = () => {
+    // 로그인 정보 제거
+    localStorage.removeItem("isLogin");
+    localStorage.removeItem("loginUserId");
+    localStorage.removeItem("loginUserName");
+    localStorage.removeItem("isAdmin");
+
+    // 로그인 화면 이동
+    router.push("/");
+  };
 
   // 역할별 사용자 이름 추출
   const leaders = users
@@ -84,9 +104,17 @@ export default function Layout({
 
           {/* 역할별 사용자 자동 표시 */}
           <p>회장: {leaders || "-"}</p>
-          <p>관리/총무: {managers || "-"}</p>
+          <p>관리: {managers || "-"}</p>
           <p>오락부장: {events || "-"}</p>
         </div>
+
+        {/* 로그아웃 */}
+        <button
+          onClick={handleLogout}
+          className="mt-4 text-xs text-gray-400 transition hover:text-gray-600"
+        >
+          로그아웃
+        </button>
       </footer>
     </div>
   );
