@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const isLoginPage = pathname === "/";
 
@@ -14,25 +13,16 @@ export default function Header() {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    const getLoginUser = () => {
-      const adminYn = localStorage.getItem("isAdmin");
-      const loginUserName = localStorage.getItem("loginUserName");
+    const adminYn = localStorage.getItem("isAdmin");
+    const loginUserName = localStorage.getItem("loginUserName");
 
-      setIsAdmin(adminYn === "Y");
-      setUserName(loginUserName ?? "");
-    };
-
-    getLoginUser();
+    setIsAdmin(adminYn === "Y");
+    setUserName(loginUserName ?? "");
   }, [pathname]);
 
   const getTitle = () => {
-    if (pathname.includes("/trip")) {
-      const mode = searchParams.get("mode");
-
-      if (mode === "new") return "여행 추가하기";
-
-      return "다가오는 여행";
-    }
+    if (pathname.includes("/trip/new")) return "여행 추가하기";
+    if (pathname.includes("/trip")) return "다가오는 여행";
 
     if (pathname.includes("/history-trip")) return "여행목록";
     if (pathname.includes("/board")) return "한줄대화";
@@ -54,7 +44,6 @@ export default function Header() {
 
   return (
     <header className="px-5 pt-4">
-      {/* 1줄: 로고 / 로그인 사용자 / 관리 버튼 */}
       <div className="flex w-full items-end justify-between">
         <h1
           onClick={handleHomeClick}
@@ -83,12 +72,9 @@ export default function Header() {
         )}
       </div>
 
-      {/* 2줄: 페이지 제목 */}
       {getTitle() && (
         <div className="mt-3">
-          <span className="text-xl font-bold text-pink-500">
-            {getTitle()}
-          </span>
+          <span className="text-xl font-bold text-pink-500">{getTitle()}</span>
         </div>
       )}
     </header>
