@@ -3,7 +3,7 @@ import "./globals.css";
 import HeaderWrapper from "./components/HeaderWrapper";
 
 export const metadata: Metadata = {
-  title: "Travel Planner",
+  title: "11 Travel Planner",
   description: "여행 계획 사이트",
 };
 

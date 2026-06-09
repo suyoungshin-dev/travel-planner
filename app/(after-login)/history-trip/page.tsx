@@ -13,7 +13,6 @@ import {
   collection,
   getDocs,
   query,
-  where,
   orderBy,
 } from "firebase/firestore";
 
@@ -21,27 +20,31 @@ import { db } from "@/app/lib/firebase";
 
 // 화면에서 사용할 타입
 type HistoryTrip = {
-  id: string; // Firebase 문서 ID
-  title: string; // 여행 제목
-  tripDate: string; // 여행 날짜 문자열
-  updatedAt: string; // 수정일
-  writerName: string; // 작성자
+  id: string;
+
+  // 여행 제목
+  title: string;
+
+  // 여행 날짜
+  tripDate: string;
+
+  // 최종 수정일
+  updatedAt: string;
+
+  // 최종 수정자
+  writerName: string;
 };
 
 export default function HistoryTripPage() {
   const router = useRouter();
 
-  // 화면에 보여줄 지난 여행 목록
+  // 화면에 보여줄 여행 목록
   const [historyTrips, setHistoryTrips] = useState<HistoryTrip[]>([]);
 
-  // 화면 최초 진입 시 실행
+  // 화면 처음 진입 시 실행
   useEffect(() => {
     const getHistoryTrips = async () => {
-      // 오늘 날짜 구하기 (예: 2026-06-02)
-      const today = new Date().toISOString().slice(0, 10);
-
       // Firebase 조회 조건
-      // endDate가 오늘보다 이전인 여행만 조회
       const q = query(
         collection(db, "ele_trip"),
 
@@ -52,25 +55,26 @@ export default function HistoryTripPage() {
       // Firebase 조회 실행
       const querySnapshot = await getDocs(q);
 
-      // 화면용 배열 생성
+      // 화면에 사용할 배열 생성
       const tripList: HistoryTrip[] = querySnapshot.docs.map((docSnap) => {
-        // 여행 데이터
         const data = docSnap.data();
 
         return {
+          // Firebase 문서 ID
           id: docSnap.id,
 
-          title: data.title,
+          // 여행 제목
+          title: data.title ?? "",
 
-          tripDate: `${data.startDate}~${data.endDate}`,
+          // 여행 기간
+          tripDate: `${data.startDate} ~ ${data.endDate}`,
 
+          // 수정일
           updatedAt: data.modDT?.toDate
             ? data.modDT.toDate().toISOString().slice(0, 10)
             : "",
 
-          // 등록자 표시
-          // 새 데이터: modName 사용
-          // 예전 데이터: modName이 없으면 modID 표시
+          // 수정자
           writerName: data.modName ?? data.modID ?? "",
         };
       });
@@ -79,12 +83,11 @@ export default function HistoryTripPage() {
       setHistoryTrips(tripList);
     };
 
-    // 함수 실행
     getHistoryTrips();
   }, []);
 
-  // 목록 클릭 시 상세 화면 이동
-  const handleRowClick = (id: string) => {
+  // 카드 클릭 시 상세화면 이동
+  const handleCardClick = (id: string) => {
     router.push(`/history-trip/${id}`);
   };
 
@@ -98,68 +101,50 @@ export default function HistoryTripPage() {
         추가와 수정이 자유로운 여행 게시판!
       </p>
 
-      {/* 게시판 영역 */}
-      <section className="mt-4 rounded-2xl bg-white shadow-sm">
-        {/* 헤더 */}
-        <div className="grid grid-cols-[50px_1fr_90px] border-b border-gray-200 px-4 py-3 text-sm font-bold text-gray-500 sm:grid-cols-[60px_1fr_180px_120px_100px]">
-          <div>번호</div>
-
-          <div>제목</div>
-
-          {/* 모바일에서는 숨김 */}
-          <div className="hidden sm:block">
-            여행날짜
-          </div>
-
-          <div>최종수정일</div>
-
-          {/* 모바일에서는 숨김 */}
-          <div className="hidden sm:block">
-            최종수정자
-          </div>
-        </div>
-
-        {/* 목록 */}
+      {/* 카드 리스트 영역 */}
+      <section className="mt-4 space-y-3">
+        {/* 여행 데이터 목록 */}
         {historyTrips.map((trip, index) => (
           <div
             key={trip.id}
-            onClick={() => handleRowClick(trip.id)}
-            className="grid cursor-pointer grid-cols-[50px_1fr_90px] border-b border-gray-100 px-4 py-4 text-sm hover:bg-pink-50 sm:grid-cols-[60px_1fr_180px_120px_100px]"
+
+            // 카드 클릭 시 상세 이동
+            onClick={() => handleCardClick(trip.id)}
+
+            // 카드 디자인
+            className="cursor-pointer rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition hover:bg-pink-50"
           >
-            {/* 번호 */}
-            <div>{index + 1}</div>
+            {/* 상단 영역 */}
+            <div className="flex items-start justify-between gap-3">
+              {/* 왼쪽 */}
+              <div className="min-w-0 flex-1">
+                {/* 번호 */}
+                {/* <p className="text-xs font-bold text-gray-400">
+                  No. {index + 1}
+                </p> */}
 
-            {/* 제목 */}
-            <div className="font-medium text-gray-800">
-              {trip.title}
-            </div>
+                {/* 제목 */}
+                <p className="mt-1 break-words text-base font-bold text-gray-800">
+                  {trip.title}
+                </p>
 
-            {/* 여행 날짜 */}
-            <div className="hidden text-gray-500 sm:block">
-              {trip.tripDate}
-            </div>
-
-            {/* 등록일 */}
-            <div className="text-gray-500">
-              {trip.updatedAt}
-            </div>
-
-            {/* 등록자 */}
-            <div className="hidden text-gray-500 sm:block">
-              {trip.writerName}
+                {/* 여행 날짜 */}
+                <p className="mt-2 text-sm text-gray-500">
+                  {trip.tripDate}
+                </p>
+              </div>              
             </div>
           </div>
         ))}
 
         {/* 데이터 없을 때 */}
         {historyTrips.length === 0 && (
-          <div className="py-10 text-center text-sm text-gray-400">
+          <div className="rounded-2xl bg-white py-10 text-center text-sm text-gray-400 shadow-sm">
             지난 여행 데이터가 없어요 🥲
           </div>
         )}
-
-
       </section>
+
       {/* 추가 버튼 */}
       <button
         onClick={() => router.push("/history-trip/new")}
@@ -167,7 +152,6 @@ export default function HistoryTripPage() {
       >
         추가
       </button>
-
     </main>
   );
 }

@@ -104,6 +104,7 @@ export default function Layout({
       shadow-sm     : 살짝 그림자
     */}
       <div className="mx-auto flex min-h-screen max-w-[430px] flex-col bg-white shadow-sm">
+        
         {/* 공통 헤더 */}
         <Header />
         {/*
@@ -135,7 +136,7 @@ export default function Layout({
             <p>회장 {leaders || "-"}</p>
 
             {/* 총무 */}
-            <p>· 총무 {managers || "-"}</p>
+            <p>· 관리 {managers || "-"}</p>
 
             {/* 오락부장 */}
             <p>· 오락부장 {events || "-"}</p>
