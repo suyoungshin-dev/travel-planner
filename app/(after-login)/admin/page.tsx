@@ -155,8 +155,12 @@ export default function AdminPage() {
   return (
     <main className="px-5 py-4">
       {/* 뒤로가기 + 안내문구 */}
-      <BackButton message="사용자 정보와 집행부 권한을 관리합니다." />
-
+      <BackButton />
+      {/* 설명 문구 */}
+      <p className="mt-2 text-xs text-gray-500">
+        사용자 정보와 집행부 권한을 관리합니다.
+      </p>
+      
       <div className="mt-6 flex justify-end">
         <button
           onClick={() => router.push("/admin/code")}

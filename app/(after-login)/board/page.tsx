@@ -211,7 +211,7 @@ export default function BoardPage() {
 
   return (
     <main className="min-h-screen bg-white p-6">
-      <div className="mt-6 flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <BackButton />
 
         {isAdmin && (

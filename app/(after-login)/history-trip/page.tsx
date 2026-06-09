@@ -112,7 +112,8 @@ export default function HistoryTripPage() {
             onClick={() => handleCardClick(trip.id)}
 
             // 카드 디자인
-            className="cursor-pointer rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition hover:bg-pink-50"
+            //className="cursor-pointer rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition hover:bg-pink-50"
+            className="cursor-pointer rounded-[16px] border border-[#7E7E7E]/20 bg-[#FFFFFF] p-4 transition hover:bg-pink-50"
           >
             {/* 상단 영역 */}
             <div className="flex items-start justify-between gap-3">

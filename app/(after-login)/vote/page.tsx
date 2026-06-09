@@ -84,6 +84,17 @@ export default function VotePage() {
                 crDT: data.crDT ?? null,
             };
         });
+        
+        voteList.sort((a, b) => {
+
+            // 진행중(active)을 위로
+            if (a.status === "active" && b.status === "done") return -1;
+
+            if (a.status === "done" && b.status === "active") return 1;
+
+            // 같은 상태면 최신 시작일 순
+            return b.startDT.localeCompare(a.startDT);
+        });
 
         setVotes(voteList);
     };
@@ -101,8 +112,11 @@ export default function VotePage() {
             {/* 뒤로가기 버튼 */}
             <BackButton />
 
-            <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-gray-800">투표</h1>
+
+            <div className="mt-4 mb-6 flex items-center justify-between">
+                <p className="text-xs text-gray-500">
+                    민주주의의 꽃은 투표입니다~
+                </p>
 
                 <button
                     onClick={() => router.push("/vote/new")}
@@ -112,65 +126,46 @@ export default function VotePage() {
                 </button>
             </div>
 
-            <p className="mt-2 text-xs text-gray-500">
-                민주주의의 꽃은 투표입니다~
-            </p>
+            {/* 투표 목록 */}
+            <section className="mt-6">
 
-            {/* 진행중인 투표 영역 */}
-            <section className="mb-4 mt-6">
-                <h2 className="mb-3 text-lg font-bold text-pink-600">
-                    진행중인 투표
-                </h2>
-
-                {activeVotes.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-pink-100 bg-white/50 p-5 text-center text-gray-400">
-                        진행중인 투표가 없습니다.
+                {votes.length === 0 ? (
+                    <div className="rounded-[16px] border border-dashed border-gray-200 bg-white/50 p-5 text-center text-gray-400">
+                        등록된 투표가 없습니다.
                     </div>
                 ) : (
                     <div className="flex flex-col gap-3">
-                        {activeVotes.map((vote) => (
+                        {votes.map((vote) => (
                             <Link key={vote.id} href={`/vote/${vote.id}`}>
-                                <div className="rounded-2xl bg-white/70 p-5 shadow-md">
-                                    <p className="font-bold text-gray-800">{vote.title}</p>
+                                <div className="rounded-[16px] border border-[#7E7E7E]/20 bg-[#FFFFFF] p-5">
 
+                                    {/* 제목 + 상태 */}
+                                    <div className="flex items-start justify-between gap-3">
+                                        <p className="line-clamp-1 font-bold text-gray-800">
+                                            {vote.title}
+                                        </p>
+
+                                        <span
+                                            className={
+                                                vote.status === "active"
+                                                    ? "shrink-0 rounded-full bg-pink-100 px-2 py-1 text-[11px] font-bold text-pink-500"
+                                                    : "shrink-0 rounded-full bg-gray-100 px-2 py-1 text-[11px] font-bold text-gray-500"
+                                            }
+                                        >
+                                            {vote.status === "active" ? "진행" : "완료"}
+                                        </span>
+                                    </div>
+
+                                    {/* 기간 */}
                                     <p className="mt-2 text-sm text-gray-500">
-                                        {vote.startDT} ~ {vote.endDT}
+                                        투표기간 : {vote.startDT.slice(2)} ~ {vote.endDT.slice(2)}
                                     </p>
 
+                                    {/* 등록자 */}
                                     <p className="mt-1 text-xs text-gray-400">
-                                        등록자: {vote.crName || "-"}
-                                    </p>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
-            </section>
-
-            {/* 진행 완료된 투표 영역 */}
-            <section>
-                <h2 className="mt-10 text-lg font-bold text-gray-900">
-                    진행 완료된 투표
-                </h2>
-
-                {doneVotes.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-gray-200 bg-white/50 p-5 text-center text-gray-400">
-                        진행 완료된 투표가 없습니다.
-                    </div>
-                ) : (
-                    <div className="flex flex-col gap-3">
-                        {doneVotes.map((vote) => (
-                            <Link key={vote.id} href={`/vote/${vote.id}`}>
-                                <div className="rounded-2xl bg-white/60 p-5 shadow-sm">
-                                    <p className="font-bold text-gray-700">{vote.title}</p>
-
-                                    <p className="mt-2 text-sm text-gray-500">
-                                        {vote.startDT} ~ {vote.endDT}
+                                        등록자 : {vote.crName || "-"}
                                     </p>
 
-                                    <p className="mt-1 text-xs text-gray-400">
-                                        등록자: {vote.crName || "-"}
-                                    </p>
                                 </div>
                             </Link>
                         ))}

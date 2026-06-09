@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { Smile } from "lucide-react";
 
 export default function Header() {
   const router = useRouter();
@@ -21,13 +22,13 @@ export default function Header() {
   }, [pathname]);
 
   const getTitle = () => {
-    if (pathname.includes("/trip/new")) return "여행 추가하기";
-    if (pathname.includes("/trip")) return "다가오는 여행";
-
-    if (pathname.includes("/history-trip")) return "여행목록";
+    if (pathname.includes("/history-trip/new")) return "여행 추가하기";
+    if (pathname.includes("/trip")) return "저장된 여행정보";
+    if (pathname.includes("/history-trip")) return "여행";
     if (pathname.includes("/board")) return "한줄대화";
+    if (pathname.includes("/vote")) return "투표";
     if (pathname.includes("/admin")) return "관리";
-    if (pathname.includes("/main")) return "";
+    if (pathname.includes("/notice")) return "공지사항";
 
     return "";
   };
@@ -43,38 +44,47 @@ export default function Header() {
   };
 
   return (
-    <header className="px-5 pt-4">
-      <div className="flex w-full items-end justify-between">
-        <h1
-          onClick={handleHomeClick}
-          className="cursor-pointer text-4xl font-bold text-[#1C70D7]"
-        >
-          11-1=0 ✈️
-        </h1>
 
-        {!isLoginPage && (
-          <div className="flex items-center gap-2 pb-1">
-            {userName && (
-              <span className="text-sm font-bold text-gray-500">
-                👤 {userName}
-              </span>
-            )}
+    <header className="relative h-[90]">
+      <h1
+        onClick={handleHomeClick}
+        className="
+                    absolute left-[32px] top-[53px]
+                    flex h-[28px] w-[79px]
+                    cursor-pointer items-center justify-center
+                    rounded-[25px]
+                    bg-[#E1EEFD]
+                    text-[13px] font-normal leading-none
+                    text-[#1C70D7]"
+      >
+        11-1=0 ✈️
+      </h1>
 
-            {isAdmin && pathname !== "/admin" && (
-              <button
-                onClick={() => router.push("/admin")}
-                className="rounded-lg bg-gray-200 px-3 py-1 text-sm font-bold text-gray-700"
-              >
-                관리
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+      {!isLoginPage && (
+        <div className="absolute right-[20px] top-[53px] flex items-center gap-2">
+          {userName && (
+            <span className="flex items-center gap-[4px] text-[12px] font-normal leading-[20px] text-[#000000]">
+              <Smile size={14} strokeWidth={2} />
+              {userName}
+            </span>
+          )}
+
+          {isAdmin && pathname !== "/admin" && (
+            <button
+              onClick={() => router.push("/admin")}
+              className="rounded-[16px] bg-gray-200 px-3 py-1 text-sm font-bold text-gray-700"
+            >
+              관리
+            </button>
+          )}
+        </div>
+      )}
 
       {getTitle() && (
-        <div className="mt-3">
-          <span className="text-xl font-bold text-pink-500">{getTitle()}</span>
+        <div className="absolute left-[70px] top-[110px]">
+          <span className="text-[20px] font-bold text-pink-500">
+            {getTitle()}
+          </span>
         </div>
       )}
     </header>

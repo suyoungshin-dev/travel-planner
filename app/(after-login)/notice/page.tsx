@@ -117,61 +117,37 @@ export default function NoticePage() {
             </p>
 
             {/* 게시판 영역 */}
-            <section className="mt-4 rounded-2xl bg-white shadow-sm">
-                {/* 헤더 */}
-                <div className="grid grid-cols-[50px_1fr_90px] border-b border-gray-200 px-4 py-3 text-sm font-bold text-gray-500 sm:grid-cols-[60px_1fr_100px_120px_100px]">
-                    <div>번호</div>
-
-                    <div>제목</div>
-
-                    {/* 모바일에서는 숨김 */}
-                    <div className="hidden sm:block">
-                        공지
-                    </div>
-
-                    <div>최종수정일</div>
-
-                    {/* 모바일에서는 숨김 */}
-                    <div className="hidden sm:block">
-                        최종수정자
-                    </div>
-                </div>
-
-                {/* 목록 */}
+            {/* 공지 목록 */}
+            <section className="mt-4 flex flex-col gap-3">
                 {notices.map((notice, index) => (
                     <div
                         key={notice.id}
                         onClick={() => handleRowClick(notice.id)}
-                        className="grid cursor-pointer grid-cols-[50px_1fr_90px] border-b border-gray-100 px-4 py-4 text-sm hover:bg-pink-50 sm:grid-cols-[60px_1fr_100px_120px_100px]"
+                        className="cursor-pointer rounded-[16px] border border-[#7E7E7E]/20 bg-[#FFFFFF] p-4"
                     >
-                        {/* 번호 */}
-                        <div>{index + 1}</div>
 
-                        {/* 제목 */}
-                        <div className="font-medium text-gray-800">
-                            {notice.title}
+                        <div className="flex items-start justify-between gap-3">
+                            <p className="line-clamp-1 text-[15px] font-bold text-gray-800">
+                                {notice.title}
+                            </p>
+
+                            {notice.isNotice && (
+                                <span className="shrink-0 rounded-full bg-pink-100 px-2 py-1 text-[11px] font-bold text-pink-500">
+                                    공지
+                                </span>
+                            )}
                         </div>
 
-                        {/* 공지 여부 */}
-                        <div className="hidden text-gray-500 sm:block">
-                            {notice.isNotice ? "O" : "X"}
-                        </div>
-
-                        {/* 최종 수정일 */}
-                        <div className="text-gray-500">
-                            {notice.updatedAt}
-                        </div>
-
-                        {/* 최종 수정자 */}
-                        <div className="hidden text-gray-500 sm:block">
-                            {notice.writerName}
+                        <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
+                            <span>
+                                최종 수정 : {notice.writerName || "-"} ({notice.updatedAt || "-"})
+                            </span>
                         </div>
                     </div>
                 ))}
 
-                {/* 데이터 없을 때 */}
                 {notices.length === 0 && (
-                    <div className="py-10 text-center text-sm text-gray-400">
+                    <div className="rounded-[16px] border border-dashed border-gray-200 py-10 text-center text-sm text-gray-400">
                         공지사항이 없어요 🥲
                     </div>
                 )}

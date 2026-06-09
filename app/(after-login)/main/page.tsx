@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Megaphone, ChevronRight } from "lucide-react";
 
 // Firebase
 import {
@@ -118,19 +119,21 @@ export default function Home() {
           {noticeList.map((notice) => (
             <div
               key={notice.id}
-              className="flex items-center justify-between rounded-xl bg-pink-100 px-4 py-3 shadow-sm"
+              className="flex items-center justify-between rounded-[20px] bg-[#1C70D7] px-4 py-3"
             >
               {/* 공지 제목 */}
-              <p className="text-sm font-medium text-pink-700">
-                📢 {notice.title}
-              </p>
+              <div className="flex items-center gap-[4px] text-[12px] font-medium leading-[140%] tracking-[-0.025em] text-[#FFFFFF]">
+                <Megaphone size={14} strokeWidth={2} fill="#FFFFFF" />
+                <span>{notice.title}</span>
+              </div>
 
               {/* 공지 보러가기 버튼 */}
               <Link
                 href={`/notice/${notice.id}`}
-                className="text-sm font-semibold text-pink-700" //text-[#1C70D7]
+                className="flex items-center gap-[2px] text-[12px] font-medium leading-[140%] tracking-[-0.025em] text-[#FFFFFF]"
               >
-                공지보기 &gt;
+                <span>공지보기</span>
+                <ChevronRight size={14} strokeWidth={2} />
               </Link>
             </div>
           ))}
@@ -140,7 +143,7 @@ export default function Home() {
       {/* 현재 계획중인 여행 */}
       <section className="mb-8">
         {upcomingTrips.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {upcomingTrips.map((trip) => {
 
               // 오늘 날짜
@@ -164,27 +167,22 @@ export default function Home() {
                   href={`/history-trip/${trip.id}`}
                   className="block"
                 >
-                  <div className="cursor-pointer rounded-2xl bg-white p-6 shadow-md hover:bg-gray-50">
+                  <div
+                    className="relative h-[108px] cursor-pointer rounded-[16px] border border-[#7E7E7E]/20 bg-[#FFFFFF]"
+                  >
+                    <p className="absolute left-[12px] top-[20px] text-[14px] font-semibold text-[#1C70D7]">
+                      현재 계획중인 여행
+                    </p>
 
-                    {/* 상단 영역 */}
-                    <div className="flex items-start justify-between">
-                      <p className="text-sm font-semibold text-pink-600">
-                        현재 계획중인 여행
-                      </p>
-
-                      {/* D-day */}
-                      <div className="rounded-full bg-orange-100 px-3 py-1 text-sm font-bold text-orange-500">
-                        D-{dday}
-                      </div>
+                    <div className="absolute right-[24px] top-[24px] rounded-full bg-[#FFE6C4] px-[12px] py-[4px] text-[12px] font-bold text-[#FF9500]">
+                      D-{dday}
                     </div>
 
-                    {/* 제목 */}
-                    <h2 className="mt-2 text-2xl font-bold text-gray-800">
+                    <h2 className="absolute left-[12px] top-[40px] title-24 text-[#0D1B3E]">
                       {trip.title}
                     </h2>
 
-                    {/* 여행 날짜 */}
-                    <p className="mt-2 text-gray-700">
+                    <p className="absolute left-[16px] top-[76px] text-[12px] text-[#8B95A1]">
                       {trip.startDate} ~ {trip.endDate}
                     </p>
                   </div>
@@ -202,15 +200,15 @@ export default function Home() {
       <div className="mt-6 grid w-fit grid-cols-2 gap-4">
         <Link
           href="/history-trip"
-          className="bg-pink-500 text-white rounded-2xl font-semibold shadow-md
-          w-32 h-32 flex items-center justify-center text-sm text-center"
+          className="bg-[#F5F7FA] text-[#000000] rounded-[16px] font-semibold 
+           w-32 h-32 flex items-center justify-center text-sm text-center"
         >
           여행
         </Link>
 
         <Link
           href="/notice"
-          className="bg-pink-500 text-white rounded-2xl font-semibold shadow-md
+          className="bg-[#F5F7FA] text-[#000000] rounded-[16px] font-semibold
           w-32 h-32 flex items-center justify-center text-sm text-center"
         >
           공지사항
@@ -218,7 +216,7 @@ export default function Home() {
 
         <Link
           href="/board"
-          className="bg-pink-500 text-white rounded-2xl font-semibold shadow-md
+          className="bg-[#F5F7FA] text-[#000000] rounded-[16px] font-semibold
           w-32 h-32 flex items-center justify-center text-sm text-center"
         >
           한줄대화
@@ -226,19 +224,13 @@ export default function Home() {
 
         <Link
           href="/vote"
-          className="bg-pink-500 text-white rounded-2xl font-semibold shadow-md
+          className="bg-[#F5F7FA] text-[#000000] rounded-[16px] font-semibold
           w-32 h-32 flex items-center justify-center text-sm text-center"
         >
           <div>
             <p>
               투표 {activeVoteCount > 0 ? `(${activeVoteCount}건)` : ""}
             </p>
-
-            {activeVoteCount > 0 && (
-              <p className="mt-1 text-[11px] font-normal text-pink-100">
-                투표해주세요!
-              </p>
-            )}
           </div>
         </Link>
       </div>
