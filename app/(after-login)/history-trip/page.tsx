@@ -8,13 +8,11 @@ import { useRouter } from "next/navigation";
 // 공통 뒤로가기 버튼
 import BackButton from "@/app/components/BackButton";
 
+// 버튼
+import MainButton from "@/app/components/common/mainbutton";
+
 // Firebase
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-} from "firebase/firestore";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
 import { db } from "@/app/lib/firebase";
 
@@ -92,49 +90,50 @@ export default function HistoryTripPage() {
   };
 
   return (
-    <main className="px-5 py-4">
+    <main className="relative px-5 py-4">
       {/* 뒤로가기 버튼 */}
       <BackButton />
 
       {/* 설명 문구 */}
-      <p className="mt-2 text-xs text-gray-500">
-        추가와 수정이 자유로운 여행 게시판!
-      </p>
+<p className="mt-2 text-[24px] font-bold leading-[34px] text-[#111111]">
+  추가와 수정이 자유로운
+  <br />
+  여행 게시판!
+</p>
 
       {/* 카드 리스트 영역 */}
       <section className="mt-4 space-y-3">
         {/* 여행 데이터 목록 */}
-        {historyTrips.map((trip, index) => (
+        {historyTrips.map((trip) => (
           <div
             key={trip.id}
-
             // 카드 클릭 시 상세 이동
             onClick={() => handleCardClick(trip.id)}
-
             // 카드 디자인
-            //className="cursor-pointer rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition hover:bg-pink-50"
-            className="cursor-pointer rounded-[16px] border border-[#7E7E7E]/20 bg-[#FFFFFF] p-4 transition hover:bg-pink-50"
+            className="
+              flex
+              h-[60px]              
+              cursor-pointer
+              items-center
+              justify-between
+              rounded-[999px]
+              border
+              border-[#F5F7FA]
+              bg-[#F5F7FA]
+              px-[20px]
+              transition
+              hover:bg-[#ECEFF3]
+            "
           >
-            {/* 상단 영역 */}
-            <div className="flex items-start justify-between gap-3">
-              {/* 왼쪽 */}
-              <div className="min-w-0 flex-1">
-                {/* 번호 */}
-                {/* <p className="text-xs font-bold text-gray-400">
-                  No. {index + 1}
-                </p> */}
+            {/* 제목 */}
+            <p className="truncate text-[16px] font-[600] text-[#111111]">
+              {trip.title}
+            </p>
 
-                {/* 제목 */}
-                <p className="mt-1 break-words text-base font-bold text-gray-800">
-                  {trip.title}
-                </p>
-
-                {/* 여행 날짜 */}
-                <p className="mt-2 text-sm text-gray-500">
-                  {trip.tripDate}
-                </p>
-              </div>              
-            </div>
+            {/* 오른쪽 화살표 */}
+            <span className="text-[24px] font-[300] leading-none text-[#111111]">
+              ›
+            </span>
           </div>
         ))}
 
@@ -147,12 +146,19 @@ export default function HistoryTripPage() {
       </section>
 
       {/* 추가 버튼 */}
-      <button
+      <MainButton
         onClick={() => router.push("/history-trip/new")}
-        className="mt-5 rounded-2xl bg-pink-500 px-6 py-3 text-sm font-bold text-white shadow-md"
+        className="
+          absolute
+          left-[24px]
+          right-[24px]
+          top-[530px]
+          h-[54px]
+          rounded-[12px]
+        "
       >
         추가
-      </button>
+      </MainButton>
     </main>
   );
 }

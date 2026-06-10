@@ -227,7 +227,7 @@ export default function NoticeDetailPage() {
             <span className="text-sm font-bold text-gray-500">제목</span>
             <span className="text-xs font-bold text-red-400">*</span>
 
-            <label className="ml-auto flex items-center gap-1 text-sm text-gray-500">
+            {/* <label className="ml-auto flex items-center gap-1 text-sm text-gray-500">
               <input
                 type="checkbox"
                 checked={noticeDetail.isNotice}
@@ -240,7 +240,7 @@ export default function NoticeDetailPage() {
                 }
               />
               공지
-            </label>
+            </label> */}
           </div>
 
           <input
@@ -299,8 +299,8 @@ export default function NoticeDetailPage() {
 
           {noticeId !== "new" && isWriter && (
             <button
-              onClick={handleDelete}
-              className="flex-1 rounded-xl bg-red-400 py-3 text-sm font-bold text-white"
+              onClick={() => router.push("/notice")}
+              className="flex-1 rounded-xl bg-red-400 py-3 text-sm font-bold text-white"              
             >
               취소
             </button>

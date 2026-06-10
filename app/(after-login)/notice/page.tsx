@@ -131,11 +131,11 @@ export default function NoticePage() {
                                 {notice.title}
                             </p>
 
-                            {notice.isNotice && (
+                            {/* {notice.isNotice && (
                                 <span className="shrink-0 rounded-full bg-pink-100 px-2 py-1 text-[11px] font-bold text-pink-500">
                                     공지
                                 </span>
-                            )}
+                            )} */}
                         </div>
 
                         <div className="mt-3 flex items-center justify-between text-xs text-gray-400">

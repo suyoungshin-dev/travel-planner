@@ -1,41 +1,46 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { MoveLeft  } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
-// 컴포넌트에서 받을 값 타입
-type BackButtonProps = {
-  message?: string;
-};
-
-export default function BackButton({
-  message,
-}: BackButtonProps) {
-
-  // 페이지 이동용 Router
+export default function BackButton() {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const getTitle = () => {
+    if (pathname.startsWith("/history-trip")) return "여행";
+    if (pathname.startsWith("/notice")) return "공지";
+    if (pathname.startsWith("/board")) return "한줄대화";
+    if (pathname.startsWith("/vote")) return "투표";
+    if (pathname.startsWith("/admin")) return "관리자";
+
+    return "";
+  };
+
+  const displayTitle = getTitle();
 
   return (
-
-    /* 뒤로가기 영역 */
-    <div className="mb-4 flex items-center gap-3">
-
-      {/* 뒤로가기 버튼 */}
+    <div className="relative mb-[8px] h-[56px] w-full">
       <button
+        type="button"
         onClick={() => router.back()}
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-white"
+        className="
+          absolute left-[11px] top-[19px]
+          flex h-[18px] w-[18px]
+          items-center justify-center
+          text-[#111111]
+        "
       >
-        <MoveLeft size={26} strokeWidth={2.5} />
+        <ChevronLeft size={28} strokeWidth={1.5} />
       </button>
 
-      {/* 안내 문구 */}
-      {message && (
-        <p className="text-sm text-gray-400">
-          {message}
-        </p>
+      {displayTitle && (
+        <div className="pointer-events-none absolute left-0 top-0 flex h-[56px] w-full items-center justify-center">
+          <span className="text-[15px] font-medium leading-[18px] text-[#111111]">
+            {displayTitle}
+          </span>
+        </div>
       )}
-
     </div>
-
   );
 }

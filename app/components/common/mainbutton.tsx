@@ -19,8 +19,6 @@ export default function MainButton({
       onClick={onClick}
       disabled={disabled}
       className={`
-        h-[56px]
-        
         rounded-[12px]
         bg-[#1C70D7]
 

@@ -121,8 +121,8 @@ export default function Layout({
         <footer className="border-t border-gray-200 bg-white px-5 py-5 text-sm text-gray-600">
 
           {/* footer 제목 */}
-          <p className="font-semibold text-[#1C70D7]">
-            집행부 정보 ({currentYear})
+          <p className="font-semibold text-[#0D1B3E]">
+            집행부 ({currentYear})
           </p>
 
           {/*

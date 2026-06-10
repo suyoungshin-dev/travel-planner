@@ -72,7 +72,7 @@ export default function Header() {
           {isAdmin && pathname !== "/admin" && (
             <button
               onClick={() => router.push("/admin")}
-              className="rounded-[16px] bg-gray-200 px-3 py-1 text-sm font-bold text-gray-700"
+              className="rounded-[4px] bg-[#191919] px-3 py-1 text-sm font-bold text-[#FFFFFF]"
             >
               관리
             </button>
@@ -80,13 +80,6 @@ export default function Header() {
         </div>
       )}
 
-      {getTitle() && (
-        <div className="absolute left-[70px] top-[110px]">
-          <span className="text-[20px] font-bold text-pink-500">
-            {getTitle()}
-          </span>
-        </div>
-      )}
     </header>
   );
 }
