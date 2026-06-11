@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
+import SectionDivider from "@/app/components/common/SectionDivider";
 import BackButton from "@/app/components/common/BackButton";
 import PageLayout from "@/app/components/common/PageLayout";
-import SectionDivider from "@/app/components/common/SectionDivider";
 
 import {
   doc,
