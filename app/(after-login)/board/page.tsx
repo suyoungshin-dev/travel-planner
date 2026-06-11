@@ -37,6 +37,7 @@ type LoginUser = {
   isLeader: boolean;
   isManager: boolean;
   isEvent: boolean;
+  isAdmin: boolean;
 };
 
 export default function BoardPage() {
@@ -46,7 +47,11 @@ export default function BoardPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
 
-  const isAdmin = currentUser?.isLeader || currentUser?.isManager || currentUser?.isEvent;
+  const isAdmin =
+    currentUser?.isAdmin ||
+    currentUser?.isLeader ||
+    currentUser?.isManager ||
+    currentUser?.isEvent;
 
   const getBoards = async () => {
     const q = query(
@@ -91,6 +96,7 @@ export default function BoardPage() {
         isLeader: localStorage.getItem("isLeader") === "Y",
         isManager: localStorage.getItem("isManager") === "Y",
         isEvent: localStorage.getItem("isEvent") === "Y",
+        isAdmin: localStorage.getItem("isAdmin") === "Y",
       });
 
       getBoards();
@@ -197,13 +203,14 @@ export default function BoardPage() {
 
   return (
     <PageLayout>
-      <div className="flex items-center gap-2">
+      <div className="relative">
         <BackButton />
 
         {isAdmin && (
           <button
+            type="button"
             onClick={handleDeleteAll}
-            className="ml-2 -mt-4 rounded-xl bg-gray-200 px-3 py-2 text-sm font-semibold text-gray-700"
+            className="absolute right-0 top-[14px] rounded-[8px] bg-gray-200 px-3 py-1 text-[13px] font-semibold text-gray-700"
           >
             삭제
           </button>
@@ -219,6 +226,11 @@ export default function BoardPage() {
         <input
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleAddComment();
+            }
+          }}
           placeholder="한마디 남겨주세요..."
           className="form-input"
         />
@@ -252,7 +264,9 @@ export default function BoardPage() {
                       className="w-full rounded border border-pink-200 px-3 py-2 text-sm outline-none focus:border-pink-400"
                     />
                   ) : (
-                    <p className="break-words text-gray-800">{board.comment}</p>
+                    <p className="break-words text-gray-800">
+                      {board.comment}
+                    </p>
                   )}
 
                   <div className="mt-1 text-sm text-gray-400">

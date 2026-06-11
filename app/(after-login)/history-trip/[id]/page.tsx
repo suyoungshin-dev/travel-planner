@@ -16,7 +16,11 @@ import {
   deleteDoc,
   serverTimestamp,
   collection,
+  getDocs,
+  query,
+  where,
 } from "firebase/firestore";
+
 import { db } from "@/app/lib/firebase";
 
 type TripDetail = {
@@ -35,6 +39,15 @@ type TripDetail = {
   createdId: string;
 };
 
+type TripComment = {
+  id: string;
+  comment: string;
+  createdId: string;
+  createdName: string;
+  createdAt: string;
+  createdAtDate: Date | null;
+};
+
 export default function HistoryTripDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -42,8 +55,9 @@ export default function HistoryTripDetailPage() {
   const tripId = params.id as string;
 
   const [tripDetail, setTripDetail] = useState<TripDetail | null>(null);
-  const [originTripDetail, setOriginTripDetail] =
-    useState<TripDetail | null>(null);
+  const [originTripDetail, setOriginTripDetail] = useState<TripDetail | null>(null);
+  const [comments, setComments] = useState<TripComment[]>([]);
+  const [newComment, setNewComment] = useState("");
 
   const loginUserId =
     typeof window !== "undefined"
@@ -55,8 +69,8 @@ export default function HistoryTripDetailPage() {
       ? localStorage.getItem("loginUserName") ?? ""
       : "";
 
-  const isWriter = loginUserId === tripDetail?.createdId;
   const isNew = tripId === "new";
+  const isWriter = loginUserId === tripDetail?.createdId;
   const isEditable = isNew || isWriter;
 
   const formatDateTime = (value: Timestamp | null | undefined) => {
@@ -93,18 +107,10 @@ export default function HistoryTripDetailPage() {
   const formatDateInput = (value: string) => {
     const onlyNumber = value.replace(/[^0-9]/g, "").slice(0, 8);
 
-    if (onlyNumber.length <= 4) {
-      return onlyNumber;
-    }
+    if (onlyNumber.length <= 4) return onlyNumber;
+    if (onlyNumber.length <= 6) return `${onlyNumber.slice(0, 4)}-${onlyNumber.slice(4)}`;
 
-    if (onlyNumber.length <= 6) {
-      return `${onlyNumber.slice(0, 4)}-${onlyNumber.slice(4)}`;
-    }
-
-    return `${onlyNumber.slice(0, 4)}-${onlyNumber.slice(
-      4,
-      6
-    )}-${onlyNumber.slice(6)}`;
+    return `${onlyNumber.slice(0, 4)}-${onlyNumber.slice(4, 6)}-${onlyNumber.slice(6)}`;
   };
 
   const getUserName = async (userId: string) => {
@@ -120,6 +126,41 @@ export default function HistoryTripDetailPage() {
     return Array.isArray(userData.user_name)
       ? userData.user_name.join(", ")
       : userId;
+  };
+
+  const getComments = async () => {
+    if (tripId === "new") return;
+
+    const commentQuery = query(
+      collection(db, "ele_trip_comment"),
+      where("tripId", "==", tripId),
+      where("isDeleted", "==", false)
+    );
+
+    const commentSnap = await getDocs(commentQuery);
+
+    const commentList: TripComment[] = commentSnap.docs
+      .map((docSnap) => {
+        const data = docSnap.data();
+        const crDT = data.crDT as Timestamp | null | undefined;
+
+        return {
+          id: docSnap.id,
+          comment: data.comment ?? "",
+          createdId: data.crID ?? "",
+          createdName: data.crName ?? "",
+          createdAt: formatDateTime(crDT),
+          createdAtDate: crDT?.toDate ? crDT.toDate() : null,
+        };
+      })
+      .sort((a, b) => {
+        const aTime = a.createdAtDate?.getTime() ?? 0;
+        const bTime = b.createdAtDate?.getTime() ?? 0;
+
+        return aTime - bTime;
+      });
+
+    setComments(commentList);
   };
 
   useEffect(() => {
@@ -167,11 +208,8 @@ export default function HistoryTripDetailPage() {
       const expenseContent = convertNewLine(payData?.content ?? "");
       const totalExpense = calculateTotalExpense(expenseContent);
 
-      const createdName =
-        tripData.crName ?? (await getUserName(tripData.crID));
-
-      const modifiedName =
-        tripData.modName ?? (await getUserName(tripData.modID));
+      const createdName = tripData.crName ?? (await getUserName(tripData.crID));
+      const modifiedName = tripData.modName ?? (await getUserName(tripData.modID));
 
       const detail: TripDetail = {
         title: tripData.title ?? "",
@@ -191,6 +229,7 @@ export default function HistoryTripDetailPage() {
 
       setTripDetail(detail);
       setOriginTripDetail(detail);
+      getComments();
     };
 
     getTripDetail();
@@ -226,11 +265,9 @@ export default function HistoryTripDetailPage() {
         notice: tripDetail.notice,
         supplies: tripDetail.supplies,
         isRegular: tripDetail.isRegular,
-
         crID: loginUserId,
         crName: loginUserName,
         crDT: serverTimestamp(),
-
         modID: loginUserId,
         modName: loginUserName,
         modDT: serverTimestamp(),
@@ -238,7 +275,6 @@ export default function HistoryTripDetailPage() {
 
       await setDoc(doc(db, "ele_paylist", newTripId), {
         content: tripDetail.expenseContent,
-
         modID: loginUserId,
         modName: loginUserName,
         modDT: serverTimestamp(),
@@ -249,10 +285,7 @@ export default function HistoryTripDetailPage() {
       return;
     }
 
-    const tripRef = doc(db, "ele_trip", tripId);
-    const payRef = doc(db, "ele_paylist", tripId);
-
-    await updateDoc(tripRef, {
+    await updateDoc(doc(db, "ele_trip", tripId), {
       title: tripDetail.title,
       startDate: tripDetail.startDate,
       endDate: tripDetail.endDate,
@@ -260,17 +293,15 @@ export default function HistoryTripDetailPage() {
       notice: tripDetail.notice,
       supplies: tripDetail.supplies,
       isRegular: tripDetail.isRegular,
-
       modID: loginUserId,
       modName: loginUserName,
       modDT: serverTimestamp(),
     });
 
     await setDoc(
-      payRef,
+      doc(db, "ele_paylist", tripId),
       {
         content: tripDetail.expenseContent,
-
         modID: loginUserId,
         modName: loginUserName,
         modDT: serverTimestamp(),
@@ -283,9 +314,7 @@ export default function HistoryTripDetailPage() {
   };
 
   const handleCancel = () => {
-    const isConfirm = confirm(
-      "작성 중인 내용이 저장되지 않을 수 있어요.\n취소하시겠어요?"
-    );
+    const isConfirm = confirm("작성 중인 내용이 저장되지 않을 수 있어요.\n취소하시겠어요?");
 
     if (!isConfirm) return;
 
@@ -298,6 +327,11 @@ export default function HistoryTripDetailPage() {
 
   const handleDelete = async () => {
     if (!tripDetail) return;
+
+    if (isNew) {
+      alert("아직 등록되지 않은 여행이에요.");
+      return;
+    }
 
     if (!isWriter) {
       alert("등록자만 삭제할 수 있어요.");
@@ -315,13 +349,58 @@ export default function HistoryTripDetailPage() {
     router.push("/history-trip");
   };
 
+  const handleAddComment = async () => {
+    if (isNew) return;
+
+    if (!newComment.trim()) {
+      alert("댓글을 입력해주세요.");
+      return;
+    }
+
+    const newCommentRef = doc(collection(db, "ele_trip_comment"));
+    const newCommentId = `ele_cmt_${newCommentRef.id}`;
+
+    await setDoc(doc(db, "ele_trip_comment", newCommentId), {
+      tripId,
+      comment: newComment,
+      crID: loginUserId,
+      crName: loginUserName,
+      crDT: serverTimestamp(),
+      modID: loginUserId,
+      modName: loginUserName,
+      modDT: serverTimestamp(),
+      isDeleted: false,
+    });
+
+    setNewComment("");
+    getComments();
+  };
+
+  const handleDeleteComment = async (commentId: string, createdId: string) => {
+    if (loginUserId !== createdId) {
+      alert("본인 댓글만 삭제할 수 있어요.");
+      return;
+    }
+
+    const isConfirm = confirm("댓글을 삭제하시겠어요?");
+
+    if (!isConfirm) return;
+
+    await updateDoc(doc(db, "ele_trip_comment", commentId), {
+      isDeleted: true,
+      modID: loginUserId,
+      modName: loginUserName,
+      modDT: serverTimestamp(),
+    });
+
+    getComments();
+  };
+
   if (!tripDetail) {
     return (
       <PageLayout>
         <BackButton />
-        <p className="mt-4 text-sm text-gray-400">
-          데이터를 불러오는 중이에요...
-        </p>
+        <p className="mt-4 text-sm text-gray-400">데이터를 불러오는 중이에요...</p>
       </PageLayout>
     );
   }
@@ -344,20 +423,9 @@ export default function HistoryTripDetailPage() {
           </div>
 
           {isEditable ? (
-            <input
-              value={tripDetail.title}
-              onChange={(e) =>
-                setTripDetail({
-                  ...tripDetail,
-                  title: e.target.value,
-                })
-              }
-              className="form-input"
-            />
+            <input value={tripDetail.title} onChange={(e) => setTripDetail({ ...tripDetail, title: e.target.value })} className="form-input" />
           ) : (
-            <div className="py-3 text-[20px] font-bold leading-[30px] text-[#111111]">
-              {tripDetail.title}
-            </div>
+            <div className="py-3 text-[20px] font-bold leading-[30px] text-[#111111]">{tripDetail.title}</div>
           )}
         </div>
 
@@ -367,35 +435,9 @@ export default function HistoryTripDetailPage() {
 
           {isEditable ? (
             <div className="flex items-center gap-2">
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={10}
-                value={tripDetail.startDate}
-                onChange={(e) =>
-                  setTripDetail({
-                    ...tripDetail,
-                    startDate: formatDateInput(e.target.value),
-                  })
-                }
-                className="form-input"
-              />
-
+              <input type="text" inputMode="numeric" maxLength={10} value={tripDetail.startDate} onChange={(e) => setTripDetail({ ...tripDetail, startDate: formatDateInput(e.target.value) })} className="form-input" />
               <span className="text-gray-400">~</span>
-
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={10}
-                value={tripDetail.endDate}
-                onChange={(e) =>
-                  setTripDetail({
-                    ...tripDetail,
-                    endDate: formatDateInput(e.target.value),
-                  })
-                }
-                className="form-input"
-              />
+              <input type="text" inputMode="numeric" maxLength={10} value={tripDetail.endDate} onChange={(e) => setTripDetail({ ...tripDetail, endDate: formatDateInput(e.target.value) })} className="form-input" />
             </div>
           ) : (
             <div className="py-3 text-[15px] leading-[24px] text-[#333333]">
@@ -408,20 +450,9 @@ export default function HistoryTripDetailPage() {
           <span className="label-text">숙소/장소</span>
 
           {isEditable ? (
-            <input
-              value={tripDetail.location}
-              onChange={(e) =>
-                setTripDetail({
-                  ...tripDetail,
-                  location: e.target.value,
-                })
-              }
-              className="form-input"
-            />
+            <input value={tripDetail.location} onChange={(e) => setTripDetail({ ...tripDetail, location: e.target.value })} className="form-input" />
           ) : (
-            <div className="py-3 text-[15px] leading-[24px] text-[#333333]">
-              {tripDetail.location || "-"}
-            </div>
+            <div className="py-3 text-[15px] leading-[24px] text-[#333333]">{tripDetail.location || "-"}</div>
           )}
         </div>
 
@@ -431,20 +462,9 @@ export default function HistoryTripDetailPage() {
           <span className="label-text">내용</span>
 
           {isEditable ? (
-            <textarea
-              value={tripDetail.notice}
-              onChange={(e) =>
-                setTripDetail({
-                  ...tripDetail,
-                  notice: e.target.value,
-                })
-              }
-              className="form-textarea"
-            />
+            <textarea value={tripDetail.notice} onChange={(e) => setTripDetail({ ...tripDetail, notice: e.target.value })} className="form-textarea" />
           ) : (
-            <div className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-7 text-[#333333]">
-              {tripDetail.notice || "-"}
-            </div>
+            <div className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-7 text-[#333333]">{tripDetail.notice || "-"}</div>
           )}
         </div>
 
@@ -452,79 +472,108 @@ export default function HistoryTripDetailPage() {
           <span className="label-text">준비물</span>
 
           {isEditable ? (
-            <textarea
-              value={tripDetail.supplies}
-              onChange={(e) =>
-                setTripDetail({
-                  ...tripDetail,
-                  supplies: e.target.value,
-                })
-              }
-              className="form-textarea"
-            />
+            <textarea value={tripDetail.supplies} onChange={(e) => setTripDetail({ ...tripDetail, supplies: e.target.value })} className="form-textarea" />
           ) : (
-            <div className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-7 text-[#333333]">
-              {tripDetail.supplies || "-"}
-            </div>
+            <div className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-7 text-[#333333]">{tripDetail.supplies || "-"}</div>
           )}
         </div>
 
         <div className="mb-5">
           <span className="label-text">지출내용</span>
-          <span className="label-desc">
-            (예. 항목-n,nnn원) 항목-금액 포맷만 계산합니다.
-          </span>
+          <span className="label-desc">(예. 항목-n,nnn원) 항목-금액 포맷만 계산합니다.</span>
 
           {isEditable ? (
             <textarea
               value={tripDetail.expenseContent}
               onChange={(e) => {
                 const expenseContent = e.target.value;
-
-                setTripDetail({
-                  ...tripDetail,
-                  expenseContent,
-                  totalExpense: calculateTotalExpense(expenseContent),
-                });
+                setTripDetail({ ...tripDetail, expenseContent, totalExpense: calculateTotalExpense(expenseContent) });
               }}
               className="form-textarea !h-[400px]"
             />
           ) : (
-            <div className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-7 text-[#333333]">
-              {tripDetail.expenseContent || "-"}
-            </div>
+            <div className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-7 text-[#333333]">{tripDetail.expenseContent || "-"}</div>
           )}
         </div>
 
         <div className="mt-4">
           <span className="label-text">총 사용금액 </span>
-
-          <input
-            value={`${tripDetail.totalExpense.toLocaleString()}원`}
-            readOnly
-            className="form-input form-input-readonly"
-          />
+          <input value={`${tripDetail.totalExpense.toLocaleString()}원`} readOnly className="form-input form-input-readonly" />
         </div>
 
         <div className="mt-5 flex gap-3">
           {isEditable && (
-            <button
-              onClick={handleUpdate}
-              className="flex-1 h-[54px] rounded-[8px] bg-[#1C70D7] text-sm font-bold text-white"
-            >
+            <button onClick={handleUpdate} className="flex-1 h-[54px] rounded-[8px] bg-[#1C70D7] text-sm font-bold text-white">
               {isNew ? "추가" : "저장"}
             </button>
           )}
 
-          {isEditable && (
-            <button
-              onClick={handleDelete}
-              className="flex-1 h-[54px] rounded-[8px] bg-[#F5F7FA] text-sm font-bold text-[#191919]"
-            >
+          {!isNew && isWriter && (
+            <button onClick={handleDelete} className="flex-1 h-[54px] rounded-[8px] bg-[#F5F7FA] text-sm font-bold text-[#191919]">
               삭제
             </button>
           )}
         </div>
+
+        {!isNew && (
+          <>
+            <SectionDivider />
+
+            <div className="mt-5">
+              <p className="label-text">댓글</p>
+
+              <div className="mt-3 flex items-stretch gap-2">
+                <input
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="form-input"
+                  placeholder="댓글을 입력하세요"
+                />
+
+                <button
+                  onClick={handleAddComment}
+                  className="w-[72px] rounded-[8px] bg-[#1C70D7] text-sm font-bold text-white"
+                >
+                  등록
+                </button>
+              </div>
+              <div className="mt-4 space-y-3">
+                {comments.length === 0 ? (
+                  <p className="text-[13px] text-gray-400">아직 댓글이 없어요.</p>
+                ) : (
+                  comments.map((item) => (
+                    <div key={item.id} className="rounded-[12px] bg-[#F5F7FA] p-4">
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <span className="text-[13px] font-bold text-[#111111]">
+                          {item.createdName}
+                        </span>
+
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className="text-[12px] text-gray-400">
+                            {item.createdAt}
+                          </span>
+
+                          {loginUserId === item.createdId && (
+                            <button
+                              onClick={() => handleDeleteComment(item.id, item.createdId)}
+                              className="text-[12px] font-bold text-gray-400"
+                            >
+                              삭제
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <p className="whitespace-pre-wrap break-words text-[14px] leading-6 text-[#333333]">
+                        {item.comment}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </>
+        )}
 
         <hr className="my-5 border-gray-200" />
 

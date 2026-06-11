@@ -362,7 +362,7 @@ export default function VoteDetailPage() {
             </button>
           )}
 
-          {isOwner && (
+          {isOwner && !isDone && (
             <button
               onClick={handleDone}
               className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600"
@@ -416,7 +416,7 @@ export default function VoteDetailPage() {
               onClick={() => !isDone && handleSelectOption(option.id)}
               disabled={isDone}
               className={`border-b border-gray-200 py-4 text-left transition
-                ${isSelected && !isDone? "bg-[#F8FBFF]": "bg-white"}`}
+                ${isSelected && !isDone ? "bg-[#F8FBFF]" : "bg-white"}`}
             >
               <div className="mb-3 flex items-center justify-between gap-3">
                 <p className="body-15-bold">
