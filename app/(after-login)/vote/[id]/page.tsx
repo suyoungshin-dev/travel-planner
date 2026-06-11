@@ -314,11 +314,10 @@ export default function VoteDetailPage() {
 
         <div className="flex items-center gap-2">
           {isOwner && !isDone && (
-            <button onClick={() => router.push(`/vote/new?id=${vote.id}`)} className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600">
+            <button onClick={() => router.push(`/vote/${vote.id}/edit`)} className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600">
               수정
             </button>
           )}
-
           {isOwner && !isDone && (
             <button onClick={handleDone} className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600">
               완료

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import BackButton from "@/app/components/common/BackButton";
 import PageLayout from "@/app/components/common/PageLayout";
-import MainButton from "@/app/components/common/MainButtonTemp";
+import MainButton from "@/app/components/common/MainButton";
 
 import {
   collection,

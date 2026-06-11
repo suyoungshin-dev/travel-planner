@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import MainButton from "@/app/components/common/MainButtonTemp";
+import MainButton from "@/app/components/common/MainButton";
 
 // Firebase
 import {
