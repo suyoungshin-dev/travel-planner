@@ -292,7 +292,7 @@ export default function NoticeDetailPage() {
                   comment: e.target.value,
                 })
               }
-              className="form-textarea"
+              className="form-textarea !h-[400px]"
             />
           ) : (
             // 읽기 전용 상태

@@ -12,7 +12,7 @@ export default function BackButton() {
     if (pathname.startsWith("/notice")) return "공지";
     if (pathname.startsWith("/board")) return "한줄대화";
     if (pathname.startsWith("/vote")) return "투표";
-    if (pathname.startsWith("/admin")) return "관리자";
+    if (pathname.startsWith("/admin")) return "관리";
 
     return "";
   };

@@ -152,7 +152,8 @@ export default function AdminPage() {
   // 취소 버튼
   const handleCancel = () => {
     // Firebase를 다시 조회하는 게 아니라, 화면 최초/마지막 저장값으로 되돌림
-    setUsers(originalUsers);
+    //setUsers(originalUsers);
+    router.back();
   };
 
   return (
