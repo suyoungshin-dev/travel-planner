@@ -32,67 +32,22 @@ type Board = {
 };
 
 type LoginUser = {
-  id: string; // 로그인한 사용자 ID
-  name: string; // 로그인한 사용자 이름
-
-  isLeader: boolean; // 회장
-  isManager: boolean; // 총무
-  isEvent: boolean; // 오락부장
+  id: string;
+  name: string;
+  isLeader: boolean;
+  isManager: boolean;
+  isEvent: boolean;
 };
 
 export default function BoardPage() {
-  // 현재 로그인한 사용자 정보
-  // 로그인 화면에서 localStorage에 저장해둔 값을 여기서 꺼내서 사용
   const [currentUser, setCurrentUser] = useState<LoginUser | null>(null);
-
   const [content, setContent] = useState("");
   const [boards, setBoards] = useState<Board[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
 
-  const isAdmin =
-    currentUser?.isLeader ||
-    currentUser?.isManager ||
-    currentUser?.isEvent;
+  const isAdmin = currentUser?.isLeader || currentUser?.isManager || currentUser?.isEvent;
 
-
-  // 화면 처음 열릴 때 로그인 사용자 정보 + 게시글 목록 조회
-  useEffect(() => {
-    const isLogin = localStorage.getItem("isLogin");
-    const loginUserId = localStorage.getItem("loginUserId");
-    const loginUserName = localStorage.getItem("loginUserName");
-
-    if (isLogin !== "Y" || !loginUserId || !loginUserName) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
-
-    setCurrentUser({
-      id: loginUserId,
-      name: loginUserName,
-
-      isLeader: localStorage.getItem("isLeader") === "Y",
-      isManager: localStorage.getItem("isManager") === "Y",
-      isEvent: localStorage.getItem("isEvent") === "Y",
-    });
-
-    getBoards();
-  }, []);
-
-  const formatDate = (date: Timestamp | null) => {
-    if (!date) return "";
-
-    return date.toDate().toLocaleString("ko-KR", {
-      year: "2-digit",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-  };
-
-  // 삭제되지 않은 게시글만 조회
   const getBoards = async () => {
     const q = query(
       collection(db, "ele_board"),
@@ -119,7 +74,42 @@ export default function BoardPage() {
     setBoards(boardList);
   };
 
-  // 새 글 등록
+  useEffect(() => {
+    const isLogin = localStorage.getItem("isLogin");
+    const loginUserId = localStorage.getItem("loginUserId");
+    const loginUserName = localStorage.getItem("loginUserName");
+
+    if (isLogin !== "Y" || !loginUserId || !loginUserName) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    setTimeout(() => {
+      setCurrentUser({
+        id: loginUserId,
+        name: loginUserName,
+        isLeader: localStorage.getItem("isLeader") === "Y",
+        isManager: localStorage.getItem("isManager") === "Y",
+        isEvent: localStorage.getItem("isEvent") === "Y",
+      });
+
+      getBoards();
+    }, 0);
+  }, []);
+
+  const formatDate = (date: Timestamp | null) => {
+    if (!date) return "";
+
+    return date.toDate().toLocaleString("ko-KR", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  };
+
   const handleAddComment = async () => {
     if (!currentUser) {
       alert("로그인이 필요합니다.");
@@ -131,7 +121,6 @@ export default function BoardPage() {
       return;
     }
 
-    // 문서 ID를 260602_랜덤값 형태로 생성
     const today = new Date();
     const yy = String(today.getFullYear()).slice(2);
     const mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -152,7 +141,6 @@ export default function BoardPage() {
     getBoards();
   };
 
-  // 본인 글 삭제
   const handleDeleteComment = async (docId: string) => {
     if (!currentUser) return;
 
@@ -169,11 +157,8 @@ export default function BoardPage() {
     getBoards();
   };
 
-  // 집행부용 전체 삭제
-  // 실제 삭제가 아니라 is_deleted=true 처리
   const handleDeleteAll = async () => {
     if (!isAdmin) return;
-    return;
 
     const isOk = confirm("전체 게시글을 삭제할까요?");
     if (!isOk) return;
@@ -190,7 +175,6 @@ export default function BoardPage() {
     getBoards();
   };
 
-  // 본인 글 수정 저장
   const handleSaveEdit = async (docId: string) => {
     if (!currentUser) return;
 
@@ -213,9 +197,7 @@ export default function BoardPage() {
 
   return (
     <PageLayout>
-
       <div className="flex items-center gap-2">
-
         <BackButton />
 
         {isAdmin && (
@@ -228,9 +210,7 @@ export default function BoardPage() {
         )}
       </div>
 
-      <p className="title-24">
-        자유롭게 의견을 올려주세요!
-      </p>
+      <p className="title-24">자유롭게 의견을 올려주세요!</p>
       <p className="caption-12">
         (데이터 용량으로 인해 비정기적으로 삭제될 수 있습니다.)
       </p>
@@ -244,18 +224,14 @@ export default function BoardPage() {
         />
 
         <div className="flex flex-col items-end gap-1">
-          <MainButton className="w-[50px]">   
+          <MainButton onClick={handleAddComment} className="w-[50px]">
             등록
           </MainButton>
-
-
         </div>
       </div>
 
       <section className="mt-6 space-y-3">
         {boards.map((board) => {
-          // 작성자 본인인지 확인
-          // 본인 글일 때만 수정/삭제 버튼 표시
           const isMine =
             currentUser !== null &&
             board.user_id.trim() === currentUser.id.trim();
@@ -276,9 +252,7 @@ export default function BoardPage() {
                       className="w-full rounded border border-pink-200 px-3 py-2 text-sm outline-none focus:border-pink-400"
                     />
                   ) : (
-                    <p className="break-words text-gray-800">
-                      {board.comment}
-                    </p>
+                    <p className="break-words text-gray-800">{board.comment}</p>
                   )}
 
                   <div className="mt-1 text-sm text-gray-400">
@@ -310,11 +284,20 @@ export default function BoardPage() {
                       </>
                     ) : (
                       <>
-                        <button onClick={() => { setEditingId(board.docId); setEditContent(board.comment); }} className="action-text">
+                        <button
+                          onClick={() => {
+                            setEditingId(board.docId);
+                            setEditContent(board.comment);
+                          }}
+                          className="action-text"
+                        >
                           수정
                         </button>
 
-                        <button onClick={() => handleDeleteComment(board.docId)} className="action-text-gray">
+                        <button
+                          onClick={() => handleDeleteComment(board.docId)}
+                          className="action-text-gray"
+                        >
                           삭제
                         </button>
                       </>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { Timestamp } from "firebase/firestore";
 
 import SectionDivider from "@/app/components/common/SectionDivider";
 import BackButton from "@/app/components/common/BackButton";
@@ -64,7 +65,7 @@ export default function HistoryTripDetailPage() {
   const canDelete = tripDetail?.createdId === loginUserId;
 
   // Firebase Timestamp를 화면용 문자열로 변환
-  const formatDateTime = (value: any) => {
+  const formatDateTime = (value: Timestamp | null | undefined) => {
     if (!value?.toDate) return "";
 
     const date = value.toDate();

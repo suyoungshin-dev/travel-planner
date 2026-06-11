@@ -32,7 +32,7 @@ export default function VoteNewPage() {
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [isMultiple, setIsMultiple] = useState(false);
     const [allowAddOption, setAllowAddOption] = useState(true);
-    const [isExecutiveOnly, setIsExecutiveOnly] = useState(false);
+    const [isExecutiveOnly] = useState(false);
 
     const [options, setOptions] = useState<string[]>(["", ""]);
 
@@ -69,16 +69,18 @@ export default function VoteNewPage() {
             return;
         }
 
-        setCurrentUser({
-            id: loginUserId,
-            name: loginUserName,
-            isLeader: localStorage.getItem("isLeader") === "Y",
-            isManager: localStorage.getItem("isManager") === "Y",
-            isEvent: localStorage.getItem("isEvent") === "Y",
-        });
+        setTimeout(() => {
+            setCurrentUser({
+                id: loginUserId,
+                name: loginUserName,
+                isLeader: localStorage.getItem("isLeader") === "Y",
+                isManager: localStorage.getItem("isManager") === "Y",
+                isEvent: localStorage.getItem("isEvent") === "Y",
+            });
 
-        setStartDT(getToday());
-        setEndDT(getDefaultEndDT());
+            setStartDT(getToday());
+            setEndDT(getDefaultEndDT());
+        }, 0);
     }, [router]);
 
     // 옵션 입력값 변경

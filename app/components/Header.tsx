@@ -10,25 +10,27 @@ export default function Header() {
 
   const isLoginPage = pathname === "/";
 
-  const [isMounted, setIsMounted] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    setIsMounted(true);
-
     const adminYn = localStorage.getItem("isAdmin");
     const loginUserName = localStorage.getItem("loginUserName");
 
-    setIsAdmin(adminYn === "Y");
-    setUserName(loginUserName ?? "");
+    setTimeout(() => {
+      setIsAdmin(adminYn === "Y");
+      setUserName(loginUserName ?? "");
+    }, 0);
   }, [pathname]);
 
   const handleHomeClick = () => {
     const isLogin = localStorage.getItem("isLogin");
 
-    if (isLogin === "Y") router.push("/main");
-    else router.push("/");
+    if (isLogin === "Y") {
+      router.push("/main");
+    } else {
+      router.push("/");
+    }
   };
 
   return (
@@ -40,7 +42,7 @@ export default function Header() {
         11-1=0 ✈️
       </h1>
 
-      {isMounted && !isLoginPage && (
+      {!isLoginPage && (
         <div className="absolute right-[20px] top-[53px] flex items-center gap-2">
           {userName && (
             <span className="flex items-center gap-[4px] text-[12px] font-normal leading-[20px] text-[#000000]">

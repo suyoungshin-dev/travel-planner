@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-
+import { Timestamp } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
 
 import BackButton from "@/app/components/common/BackButton";
@@ -54,7 +54,7 @@ export default function NoticeDetailPage() {
       ? localStorage.getItem("loginUserName") ?? ""
       : "";
 
-  const formatDateTime = (value: any) => {
+  const formatDateTime = (value: Timestamp | null | undefined) => {
     if (!value?.toDate) return "";
 
     const date = value.toDate();
