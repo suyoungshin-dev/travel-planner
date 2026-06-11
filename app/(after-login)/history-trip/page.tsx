@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 // 버튼
 import BackButton from "@/app/components/common/BackButton";
-import MainButton from "@/app/components/common/MainButton";
+import MainButton from "@/app/components/common/MainButtonTemp";
 import PageLayout from "@/app/components/common/PageLayout";
 
 // Firebase

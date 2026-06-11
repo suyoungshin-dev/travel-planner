@@ -9,7 +9,7 @@ import { db } from "@/app/lib/firebase";
 import BackButton from "@/app/components/common/BackButton";
 import PageLayout from "@/app/components/common/PageLayout";
 import SectionDivider from "@/app/components/common/SectionDivider";
-import MainButton from "@/app/components/common/MainButton";
+import MainButton from "@/app/components/common/MainButtonTemp";
 import SubButton from "@/app/components/common/SubButton";
 
 type LoginUser = {
