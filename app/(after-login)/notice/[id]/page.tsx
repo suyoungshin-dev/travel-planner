@@ -282,7 +282,6 @@ export default function NoticeDetailPage() {
           </span>
 
           {isEditable ? (
-
             // 수정 가능 상태
             <textarea
               value={noticeDetail.comment}
