@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Megaphone, ChevronRight } from "lucide-react";
 import { MENU_LIST } from "@/app/constants/menu";
+import PageLayout from "@/app/components/common/PageLayout";
 
 // Firebase
 import {
@@ -113,7 +114,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="px-5 py-4">
+    <PageLayout>
       {/* 공지사항 */}
       {noticeList.length > 0 && (
         <section className="mb-4 space-y-1">
@@ -221,6 +222,6 @@ export default function Home() {
           );
         })}
       </div>
-    </main>
+    </PageLayout>
   );
 }
