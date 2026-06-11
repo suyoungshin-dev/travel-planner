@@ -327,14 +327,14 @@ export default function NoticeDetailPage() {
           )}
 
           {/* 취소 */}
-          {isEditable && (
+          {/* {isEditable && (
             <SubButton
               onClick={handleCancel}
               className="flex-1"
             >
               취소
             </SubButton>
-          )}
+          )} */}
 
         </div>
       </section>
