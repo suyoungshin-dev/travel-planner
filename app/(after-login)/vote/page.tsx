@@ -117,8 +117,8 @@ export default function VotePage() {
 
 
             <div className="mt-4 mb-6 flex items-center justify-between">
-                <p className="text-xs text-gray-500">
-                    민주주의의 꽃은 투표입니다~
+                <p className="title-24">
+                    민주주의의 꽃은 투표입니다
                 </p>
             </div>
 

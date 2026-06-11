@@ -198,31 +198,28 @@ export default function Home() {
         )}
       </section>
 
-      <div className="mt-6 grid w-fit grid-cols-2 gap-4">
-        {MENU_LIST.map((menu) => (
-          <Link
-            key={menu.href}
-            href={menu.href}
-            className="bg-[#F5F7FA] text-[#000000] rounded-[16px] font-semibold 
-                       w-32 h-32 flex items-center justify-center text-sm text-center"
-          >
-            <div className="flex items-center gap-1">
+      <div className="mt-6 grid grid-cols-2 gap-[14px]">
+        {MENU_LIST.map((menu) => {
+          const Icon = menu.icon;
 
-              {/* 메뉴명 */}
-              <span>{menu.title}</span>
+          return (
+            <Link key={menu.href} href={menu.href} className="flex h-[124px] flex-col rounded-[16px] bg-[#F5F7FA] pl-[28px] pt-[24px]">
+              <Icon size={30} strokeWidth={2} className="text-[#1C70D7]" />
 
-              {/* 투표 건수 */}
-              {menu.showCount && activeVoteCount > 0 && (
-                <span
-                  className="flex h-[16px] min-w-[16px] items-center justify-center rounded-full
-                             bg-[#2F80ED] px-[4px] text-[10px] font-bold text-white"
-                >
-                  {activeVoteCount}
+              <div className="mt-[24px] flex items-center">
+                <span className="text-[16px] font-bold leading-none text-[#111111]">
+                  {menu.title}
                 </span>
-              )}
-            </div>
-          </Link>
-        ))}
+
+                {menu.showCount && activeVoteCount > 0 && (
+                  <span className="ml-[6px] flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-[#1C70D7] px-[6px] text-[13px] font-bold text-white">
+                    {activeVoteCount}
+                  </span>
+                )}
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </main>
   );

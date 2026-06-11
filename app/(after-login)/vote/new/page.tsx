@@ -8,6 +8,9 @@ import { db } from "@/app/lib/firebase";
 
 import BackButton from "@/app/components/common/BackButton";
 import PageLayout from "@/app/components/common/PageLayout";
+import SectionDivider from "@/app/components/common/SectionDivider";
+import MainButton from "@/app/components/common/MainButton";
+import SubButton from "@/app/components/common/SubButton";
 
 type LoginUser = {
     id: string;
@@ -184,55 +187,55 @@ export default function VoteNewPage() {
         <PageLayout>
             <BackButton />
 
-            <h1 className="mb-6 text-2xl font-bold text-gray-800">투표 등록</h1>
+            <h1 className="mb-6 text-[22px] font-bold text-[#111111]">투표 등록</h1>
 
             <section className="space-y-4">
                 {/* 제목 */}
                 <div>
-                    <label className="mb-1 block text-sm font-bold text-gray-700">
-                        제목 *
-                    </label>
+                    <span className="label-text">제목</span>
+                    <span className="required-star">*</span>
                     <input
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="제목을 입력해주세요."
-                        className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-pink-300"
+                        className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#1C70D7]"
                     />
                 </div>
 
                 {/* 기간 */}
                 <div>
-                    <label className="mb-1 block text-sm font-bold text-gray-700">
-                        기간 *
-                    </label>
+                    <span className="label-text">기간</span>
+                    <span className="required-star">*</span>
 
                     <div className="grid grid-cols-2 gap-2">
                         <input
                             type="date"
                             value={startDT}
                             onChange={(e) => setStartDT(e.target.value)}
-                            className="rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-pink-300"
+                            className="rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#1C70D7]"
                         />
 
                         <input
                             type="date"
                             value={endDT}
                             onChange={(e) => setEndDT(e.target.value)}
-                            className="rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-pink-300"
+                            className="rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#1C70D7]"
                         />
                     </div>
                 </div>
 
+                <SectionDivider />
+
                 {/* 옵션 */}
                 <div>
-                    <div className="mb-2 flex items-center justify-between">
-                        <label className="block text-sm font-bold text-gray-700">
-                            투표 항목 *
-                        </label>
+                    <div className="mb-2 flex items-center">
+                        <span className="label-text">투표 항목</span>
+                        <span className="required-star">*</span>
 
                         <button
+                            type="button"
                             onClick={handleAddOption}
-                            className="rounded-lg bg-pink-100 px-3 py-1 text-sm font-bold text-pink-600"
+                            className="ml-auto rounded-lg bg-[#EAF3FF] px-3 py-1 text-[13px] font-bold text-[#1C70D7]"
                         >
                             + 항목 추가
                         </button>
@@ -245,10 +248,11 @@ export default function VoteNewPage() {
                                     value={option}
                                     onChange={(e) => handleChangeOption(index, e.target.value)}
                                     placeholder={`항목 ${index + 1}`}
-                                    className="flex-1 rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-pink-300"
+                                    className="flex-1 rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#1C70D7]"
                                 />
 
                                 <button
+                                    type="button"
                                     onClick={() => handleDeleteOption(index)}
                                     className="rounded-xl bg-gray-100 px-3 text-sm font-bold text-gray-500"
                                 >
@@ -259,67 +263,54 @@ export default function VoteNewPage() {
                     </div>
                 </div>
 
-                {/* 설정 */}
-                <div className="rounded-2xl bg-white p-4 shadow-sm">
-                    <p className="mb-3 text-sm font-bold text-gray-700">투표 설정</p>
+                <SectionDivider />
 
-                    <label className="mb-3 flex items-center gap-2 text-sm text-gray-600">
-                        <input
-                            type="checkbox"
-                            checked={isAnonymous}
-                            onChange={(e) => setIsAnonymous(e.target.checked)}
-                            className="h-4 w-4 accent-pink-500"
-                        />
-                        익명 투표
-                    </label>
+                {/* 투표 설정 */}
+                <div>
+                    <span className="label-text">투표 설정</span>
 
-                    <label className="mb-3 flex items-center gap-2 text-sm text-gray-600">
-                        <input
-                            type="checkbox"
-                            checked={isMultiple}
-                            onChange={(e) => setIsMultiple(e.target.checked)}
-                            className="h-4 w-4 accent-pink-500"
-                        />
-                        복수 선택 가능
-                    </label>
+                    <div className="mt-3 space-y-3">
+                        <label className="flex items-center gap-2 text-sm text-gray-600">
+                            <input
+                                type="checkbox"
+                                checked={isAnonymous}
+                                onChange={(e) => setIsAnonymous(e.target.checked)}
+                                className="h-4 w-4 accent-[#1C70D7]"
+                            />
+                            익명 투표
+                        </label>
 
-                    <label className="mb-3 flex items-center gap-2 text-sm text-gray-600">
-                        <input
-                            type="checkbox"
-                            checked={allowAddOption}
-                            onChange={(e) => setAllowAddOption(e.target.checked)}
-                            className="h-4 w-4 accent-pink-500"
-                        />
-                        참여자가 항목 추가 가능
-                    </label>
+                        <label className="flex items-center gap-2 text-sm text-gray-600">
+                            <input
+                                type="checkbox"
+                                checked={isMultiple}
+                                onChange={(e) => setIsMultiple(e.target.checked)}
+                                className="h-4 w-4 accent-[#1C70D7]"
+                            />
+                            복수 선택 가능
+                        </label>
 
-                    {/* 추후 필요할 수 있어서 추가 (isExecutiveOnly) */}
-                    {/* <label className="flex items-center gap-2 text-sm text-gray-600">
-            <input
-              type="checkbox"
-              checked={isExecutiveOnly}
-              onChange={(e) => setIsExecutiveOnly(e.target.checked)}
-              className="h-4 w-4 accent-pink-500"
-            />
-            집행부 전용
-          </label> */}
+                        <label className="flex items-center gap-2 text-sm text-gray-600">
+                            <input
+                                type="checkbox"
+                                checked={allowAddOption}
+                                onChange={(e) => setAllowAddOption(e.target.checked)}
+                                className="h-4 w-4 accent-[#1C70D7]"
+                            />
+                            참여자가 항목 추가 가능
+                        </label>
+                    </div>
                 </div>
             </section>
 
-            <div className="mt-6 flex justify-end gap-2">
-                <button
-                    onClick={() => router.push("/vote")}
-                    className="rounded-xl bg-gray-100 px-5 py-2 font-bold text-gray-500"
-                >
-                    취소
-                </button>
-
-                <button
-                    onClick={handleSave}
-                    className="rounded-xl bg-pink-500 px-5 py-2 font-bold text-white"
-                >
+            <div className="mt-6 flex gap-2">
+                <MainButton onClick={handleSave} className="flex-1">
                     등록
-                </button>
+                </MainButton>
+
+                <SubButton onClick={() => router.push("/vote")} className="flex-1">
+                    취소
+                </SubButton>
             </div>
         </PageLayout>
     );

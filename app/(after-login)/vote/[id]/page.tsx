@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { db } from "@/app/lib/firebase";
+
 import BackButton from "@/app/components/common/BackButton";
+import PageLayout from "@/app/components/common/PageLayout";
+import MainButton from "@/app/components/common/MainButton";
 
 import {
   doc,
@@ -12,8 +16,6 @@ import {
   serverTimestamp,
   Timestamp,
 } from "firebase/firestore";
-import { db } from "@/app/lib/firebase";
-import PageLayout from "@/app/components/common/PageLayout";
 
 type LoginUser = {
   id: string;
@@ -332,14 +334,14 @@ export default function VoteDetailPage() {
           <h1 className="text-xl font-extrabold text-gray-900">{vote.title}</h1>
 
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-gray-500">
-            <span>{vote.startDT}</span>
+            <span>{vote.startDT.slice(2)}</span>
             <span>~</span>
-            <span>{vote.endDT}</span>
+            <span>{vote.endDT.slice(2)}</span>
 
             <span
               className={`rounded-full px-2 py-0.5 text-xs font-bold ${isDone
-                ? "bg-gray-100 text-gray-500"
-                : "bg-pink-100 text-pink-600"
+                ? "status-badge-gray"
+                : "status-badge"
                 }`}
             >
               {isDone ? "완료" : "진행중"}
@@ -380,25 +382,15 @@ export default function VoteDetailPage() {
         </div>
       </div>
 
-      <div className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
-        <div className="flex items-center justify-between">
-          <p className="text-base font-extrabold text-gray-800">
-            {isDone ? "투표 결과" : "투표하기"}
-          </p>
-
-          <p className="text-sm font-bold text-pink-500">
-            참여 {totalVoterCount}명
-          </p>
-        </div>
-
-        <div className="mt-2 flex flex-wrap gap-1 text-xs text-gray-400">
+      <div className="mb-4">
+        <div className="mt-1 flex flex-wrap gap-2 caption-13 text-gray-400">
           {vote.isAnonymous && <span>익명투표</span>}
           {vote.isMultiple && <span>복수선택 가능</span>}
           {vote.isMultiple && <span>총 {totalVoteCount}표</span>}
         </div>
 
         {!isDone && isVoted && (
-          <p className="mt-3 rounded-xl bg-pink-50 px-3 py-2 text-xs font-medium text-pink-500">
+          <p className="mt-1 rounded-[8px] bg-[#EEF5FF] px-3 py-2 caption-13 text-[#1C70D7]">
             이미 투표했어요. 다시 선택 후 저장하면 변경됩니다.
           </p>
         )}
@@ -417,35 +409,31 @@ export default function VoteDetailPage() {
           const isWinner = isDone && count > 0 && count === maxCount;
           const voterNames = getOptionVoterNames(option.id);
 
+
           return (
             <button
               key={option.id}
               onClick={() => !isDone && handleSelectOption(option.id)}
               disabled={isDone}
-              className={`rounded-2xl p-4 text-left shadow-sm transition ${isSelected && !isDone
-                ? "bg-pink-50 ring-2 ring-pink-300"
-                : "bg-white"
-                }`}
+              className={`border-b border-gray-200 py-4 text-left transition
+                ${isSelected && !isDone? "bg-[#F8FBFF]": "bg-white"}`}
             >
               <div className="mb-3 flex items-center justify-between gap-3">
-                <p className="text-base font-extrabold text-gray-800">
+                <p className="body-15-bold">
                   {isSelected && !isDone && (
-                    <span className="mr-1 text-pink-500">✓</span>
+                    <span className="mr-1 text-[#1C70D7]">✓</span>
                   )}
                   {option.text}
                 </p>
 
-                <p
-                  className={`shrink-0 text-sm font-extrabold ${isWinner ? "text-pink-600" : "text-gray-500"
-                    }`}
-                >
+                <p className={isWinner ? "label-text" : "caption-13-bold"}>
                   {count}표
                 </p>
               </div>
 
               <div className="h-2.5 overflow-hidden rounded-full bg-gray-200">
                 <div
-                  className={`h-full rounded-full ${isWinner ? "bg-pink-500" : "bg-gray-400"
+                  className={`h-full rounded-full ${isWinner ? "bg-[#1C70D7]" : "bg-gray-400"
                     }`}
                   style={{ width: `${percent}%` }}
                 />
@@ -475,14 +463,12 @@ export default function VoteDetailPage() {
 
       {!isDone && (
         <div className="mt-6 flex gap-2">
-
-
-          <button
+          <MainButton
             onClick={handleVote}
-            className="flex-1 rounded-xl bg-pink-500 px-5 py-3 font-bold text-white"
+            className="w-full"
           >
             {isVoted ? "다시 투표" : "투표하기"}
-          </button>
+          </MainButton>
 
         </div>
       )}

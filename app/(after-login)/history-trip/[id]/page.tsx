@@ -171,7 +171,7 @@ export default function HistoryTripDetailPage() {
         return;
       }
 
-      //const tripRef = doc(db, "ele_trip", tripId);
+      const tripRef = doc(db, "ele_trip", tripId);
       const tripSnap = await getDoc(tripRef);
 
       if (!tripSnap.exists()) return;

@@ -131,7 +131,7 @@ export default function NoticePage() {
                             </p>
 
                             {notice.isNotice && (
-                                <span className="shrink-0 rounded-full bg-pink-100 px-2 py-1 text-[11px] font-bold text-pink-500">
+                                <span className="status-badge">
                                     공지
                                 </span>
                             )}

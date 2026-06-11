@@ -72,7 +72,7 @@ export default function Header() {
           {isAdmin && pathname !== "/admin" && (
             <button
               onClick={() => router.push("/admin")}
-              className="rounded-[4px] bg-[#191919] px-3 py-1 text-sm font-bold text-[#FFFFFF]"
+              className="flex h-[22px] w-[37px] items-center justify-center rounded-[4px] bg-[#191919] text-[12px] font-bold text-white"
             >
               관리
             </button>

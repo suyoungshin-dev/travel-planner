@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/app/components/common/BackButton";
 import PageLayout from "@/app/components/common/PageLayout";
+import MainButton from "@/app/components/common/MainButton";
+import SubButton from "@/app/components/common/SubButton";
 
 // Firestore에서 컬렉션 조회용 함수들
 import {
@@ -111,7 +113,7 @@ export default function AdminCodePage() {
             <PageLayout>
                 <BackButton />
                 <p className="mt-6 text-sm text-gray-400">불러오는 중...</p>
-           </PageLayout>
+            </PageLayout>
         );
     }
 
@@ -119,24 +121,26 @@ export default function AdminCodePage() {
         <PageLayout>
             <BackButton />
 
-            <section className="mt-8 rounded-2xl border border-pink-100 bg-pink-50 p-5 shadow-sm">
-                <h1 className="mb-5 text-lg font-bold text-gray-700">
+            <section className="mt-6">
+                <h1 className="title-24">
                     로그인 코드 관리
                 </h1>
 
-                <div className="mb-4">
-                    <p className="mb-1 text-sm font-bold text-gray-500">현재코드</p>
-                    <div className="rounded-xl bg-white px-4 py-3 text-base font-bold text-pink-600">
+                <div className="mt-6 mb-5">
+                    <p className="label-text mb-2">현재코드</p>
+
+                    <div className="rounded-xl bg-[#F5F7FA] px-4 py-3 text-base font-bold text-[#1C70D7]">
                         {currentCode || "-"}
                     </div>
                 </div>
 
-                <div className="mb-4">
-                    <p className="mb-1 text-sm font-bold text-gray-500">변경코드</p>
+                <div className="mb-5">
+                    <p className="label-text mb-2">변경코드</p>
+
                     <input
                         value={newCode}
                         onChange={(e) => setNewCode(e.target.value)}
-                        className="w-full rounded-xl border border-pink-200 px-4 py-3 text-base outline-none focus:border-pink-400"
+                        className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base outline-none focus:border-[#1C70D7]"
                         placeholder="변경할 코드를 입력하세요"
                     />
                 </div>
@@ -146,24 +150,25 @@ export default function AdminCodePage() {
                         type="checkbox"
                         checked={isUse}
                         onChange={(e) => setIsUse(e.target.checked)}
+                        className="h-4 w-4 accent-[#1C70D7]"
                     />
                     현재 운영중
                 </label>
 
                 <div className="flex gap-2">
-                    <button
+                    <MainButton
                         onClick={handleSave}
-                        className="flex-1 rounded-xl bg-pink-400 py-3 text-sm font-bold text-white"
+                        className="flex-1"
                     >
                         저장
-                    </button>
+                    </MainButton>
 
-                    <button
+                    <SubButton
                         onClick={handleCancel}
-                        className="flex-1 rounded-xl bg-gray-100 py-3 text-sm font-bold text-gray-500"
+                        className="flex-1"
                     >
                         취소
-                    </button>
+                    </SubButton>
                 </div>
             </section>
         </PageLayout>

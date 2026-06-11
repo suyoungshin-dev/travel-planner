@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+
+import { db } from "@/app/lib/firebase";
+
 import BackButton from "@/app/components/common/BackButton";
 import PageLayout from "@/app/components/common/PageLayout";
+import MainButton from "@/app/components/common/MainButton";
+import SubButton from "@/app/components/common/SubButton";
 
 import {
   doc,
@@ -14,7 +19,6 @@ import {
   serverTimestamp,
   collection,
 } from "firebase/firestore";
-import { db } from "@/app/lib/firebase";
 
 type NoticeDetail = {
   title: string;
@@ -227,8 +231,8 @@ export default function NoticeDetailPage() {
       <section className="mt-4">
         <div className="mb-5">
           <div className="mb-2 flex items-center gap-3">
-            <span className="text-sm font-bold text-gray-500">제목</span>
-            <span className="text-xs font-bold text-red-400">*</span>
+            <span className="label-text">제목</span>
+            <span className="required-star">*</span>
 
             <label className="ml-auto flex items-center gap-1 text-sm text-gray-500">
               <input
@@ -257,7 +261,7 @@ export default function NoticeDetailPage() {
                   title: e.target.value,
                 })
               }
-              className="w-full rounded-xl border border-pink-200 bg-white px-4 py-3"
+              className="form-input"
             />
 
           ) : (
@@ -273,7 +277,7 @@ export default function NoticeDetailPage() {
         </div>
 
         <div className="mb-5">
-          <span className="text-sm font-bold text-gray-500">
+          <span className="label-text">
             내용
           </span>
 
@@ -288,7 +292,7 @@ export default function NoticeDetailPage() {
                   comment: e.target.value,
                 })
               }
-              className="mt-2 h-64 w-full resize-none rounded-xl border border-pink-200 bg-white px-4 py-3 "
+              className="form-textarea"
             />
           ) : (
             // 읽기 전용 상태
@@ -302,48 +306,37 @@ export default function NoticeDetailPage() {
         </div>
 
         <div className="mt-6 flex gap-3">
+
+          {/* 저장 */}
           {isEditable && (
-            <button
+            <MainButton
               onClick={handleUpdate}
-              className="flex-1 rounded-xl bg-pink-500 py-3 text-sm font-bold text-white"
+              className="flex-1"
             >
               {isNew ? "추가" : "저장"}
-            </button>
+            </MainButton>
           )}
 
-          {/* 삭제는 작성자만 */}
+          {/* 삭제 */}
           {!isNew && isWriter && (
-            <button
+            <SubButton
               onClick={handleDelete}
-              className="flex-1 rounded-xl bg-red-400 py-3 text-sm font-bold text-white"
+              className="flex-1"
             >
               삭제
-            </button>
+            </SubButton>
           )}
 
-          {/* 취소는 new, 작성자만 */}
+          {/* 취소 */}
           {isEditable && (
-            <button
+            <SubButton
               onClick={handleCancel}
-              className="flex-1 rounded-xl bg-gray-100 py-3 text-sm font-bold text-gray-600"
+              className="flex-1"
             >
               취소
-            </button>
+            </SubButton>
           )}
-        </div>
 
-        <hr className="my-5 border-gray-200" />
-
-        <div className="space-y-3 text-sm text-gray-600">
-          <div>
-            <span className="font-bold text-gray-500">최종수정일시 : </span>
-            {noticeDetail.modifiedAt}
-          </div>
-
-          <div>
-            <span className="font-bold text-gray-500">등록자 : </span>
-            {noticeDetail.createdName}
-          </div>
         </div>
       </section>
     </PageLayout>
