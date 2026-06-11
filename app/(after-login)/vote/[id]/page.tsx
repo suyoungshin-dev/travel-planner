@@ -6,7 +6,7 @@ import { db } from "@/app/lib/firebase";
 
 import BackButton from "@/app/components/common/BackButton";
 import PageLayout from "@/app/components/common/PageLayout";
-import MainButton from "@/app/components/common/MainButtonTemp";
+import MainButton from "@/app/components/common/MainButton";
 
 import {
   doc,
@@ -67,45 +67,36 @@ export default function VoteDetailPage() {
   const router = useRouter();
   const params = useParams();
 
-  // URL의 [id] 값
   const voteId = params.id as string;
 
-  // 로그인 사용자 정보
   const [currentUser, setCurrentUser] = useState<LoginUser | null>(null);
-
-  // Firebase에서 가져온 투표 정보
   const [vote, setVote] = useState<Vote | null>(null);
-
-  // 화면 로딩 상태
   const [isLoading, setIsLoading] = useState(true);
-
-  // 사용자가 현재 화면에서 선택한 투표 항목들
   const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([]);
 
-  // 화면 최초 진입 시 실행
   useEffect(() => {
-    const getPageData = async () => {
-      const isLogin = localStorage.getItem("isLogin");
-      const loginUserId = localStorage.getItem("loginUserId");
-      const loginUserName = localStorage.getItem("loginUserName");
+    const loginUserId = localStorage.getItem("loginUserId");
+    const loginUserName = localStorage.getItem("loginUserName");
+    const isAdmin = localStorage.getItem("isAdmin");
 
-      if (isLogin !== "Y" || !loginUserId || !loginUserName) {
-        alert("로그인이 필요합니다.");
-        router.push("/");
-        return;
-      }
+    if (!loginUserId || !loginUserName) {
+      router.push("/");
+      return;
+    }
 
-      const userInfo: LoginUser = {
-        id: loginUserId,
-        name: loginUserName,
-        isLeader: localStorage.getItem("isLeader") === "Y",
-        isManager: localStorage.getItem("isManager") === "Y",
-        isEvent: localStorage.getItem("isEvent") === "Y",
-      };
+    setCurrentUser({
+      id: loginUserId,
+      name: loginUserName,
+      isLeader: isAdmin === "Y",
+      isManager: isAdmin === "Y",
+      isEvent: isAdmin === "Y",
+    });
+  }, [router]);
 
-      setCurrentUser(userInfo);
+  useEffect(() => {
+    const getVoteDetail = async () => {
+      if (!voteId) return;
 
-      // Firebase에서 현재 투표 상세 조회
       const voteRef = doc(db, "ele_vote", voteId);
       const voteSnap = await getDoc(voteRef);
 
@@ -134,39 +125,38 @@ export default function VoteDetailPage() {
 
         crID: data.crID ?? "",
         crName: data.crName ?? "",
-        crDT: data.crDT ?? null,
+        crDT: data.crDT,
 
-        modID: data.modID ?? "",
-        modName: data.modName ?? "",
-        modDT: data.modDT ?? null,
+        modID: data.modID,
+        modName: data.modName,
+        modDT: data.modDT,
 
         is_deleted: data.is_deleted ?? false,
       };
 
       setVote(voteData);
-
-      // 이미 내가 투표한 내역이 있으면 화면에도 체크 표시
-      const myVote = voteData.voters.find(
-        (voter) => voter.userId === userInfo.id
-      );
-
-      setSelectedOptionIds(myVote?.optionIds ?? []);
       setIsLoading(false);
     };
 
-    getPageData();
-  }, [router, voteId]);
+    getVoteDetail();
+  }, [voteId]);
 
-  // 투표 항목 클릭 이벤트
+  useEffect(() => {
+    if (!vote || !currentUser) return;
+
+    const myVote = vote.voters.find((voter) => voter.userId === currentUser.id);
+
+    if (myVote) {
+      setSelectedOptionIds(myVote.optionIds);
+    }
+  }, [vote, currentUser]);
+
   const handleSelectOption = (optionId: string) => {
     if (!vote) return;
 
-    // 복수 선택 가능일 때
     if (vote.isMultiple) {
       if (selectedOptionIds.includes(optionId)) {
-        setSelectedOptionIds(
-          selectedOptionIds.filter((id) => id !== optionId)
-        );
+        setSelectedOptionIds(selectedOptionIds.filter((id) => id !== optionId));
       } else {
         setSelectedOptionIds([...selectedOptionIds, optionId]);
       }
@@ -174,11 +164,9 @@ export default function VoteDetailPage() {
       return;
     }
 
-    // 단일 선택일 때
     setSelectedOptionIds([optionId]);
   };
 
-  // 투표 저장
   const handleVote = async () => {
     if (!vote || !currentUser) return;
 
@@ -193,10 +181,7 @@ export default function VoteDetailPage() {
     }
 
     const newVoters = [
-      // 기존 내 투표는 제거
       ...vote.voters.filter((voter) => voter.userId !== currentUser.id),
-
-      // 새로 선택한 투표 저장
       {
         userId: currentUser.id,
         userName: currentUser.name,
@@ -222,7 +207,6 @@ export default function VoteDetailPage() {
     alert("투표가 저장되었습니다.");
   };
 
-  // 투표 완료 처리
   const handleDone = async () => {
     if (!vote || !currentUser) return;
 
@@ -247,31 +231,23 @@ export default function VoteDetailPage() {
     alert("투표가 완료 처리되었습니다.");
   };
 
-  // 투표 삭제
   const handleDelete = async () => {
     if (!vote) return;
 
-    const isConfirm = confirm("투표를 삭제할까요?");
+    if (!confirm("투표를 삭제할까요?")) return;
 
-    if (!isConfirm) return;
-
-    // 실제 삭제
     await deleteDoc(doc(db, "ele_vote", vote.id));
 
     alert("삭제되었습니다.");
-
     router.push("/vote");
   };
 
-  // 항목별 득표 수 계산
   const getOptionCount = (optionId: string) => {
     if (!vote) return 0;
 
-    return vote.voters.filter((voter) => voter.optionIds.includes(optionId))
-      .length;
+    return vote.voters.filter((voter) => voter.optionIds.includes(optionId)).length;
   };
 
-  // 항목별 투표자 이름 목록
   const getOptionVoterNames = (optionId: string) => {
     if (!vote) return [];
 
@@ -300,26 +276,16 @@ export default function VoteDetailPage() {
 
   if (!currentUser) return null;
 
-  // 내가 만든 투표인지
   const isOwner = vote.crID === currentUser.id;
-
-  // 투표 완료 여부
   const isDone = vote.status === "done";
-
-  // 내가 이미 투표했는지
   const myVote = vote.voters.find((voter) => voter.userId === currentUser.id);
   const isVoted = !!myVote;
 
-  // 전체 참여자 수
-  const totalVoterCount = vote.voters.length;
-
-  // 복수선택이면 총 표 수와 참여자 수가 다를 수 있음
   const totalVoteCount = vote.options.reduce(
     (sum, option) => sum + getOptionCount(option.id),
     0
   );
 
-  // 최고 득표 수
   const maxCount = Math.max(
     0,
     ...vote.options.map((option) => getOptionCount(option.id))
@@ -338,12 +304,7 @@ export default function VoteDetailPage() {
             <span>~</span>
             <span>{vote.endDT.slice(2)}</span>
 
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs font-bold ${isDone
-                ? "status-badge-gray"
-                : "status-badge"
-                }`}
-            >
+            <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${isDone ? "status-badge-gray" : "status-badge"}`}>
               {isDone ? "완료" : "진행중"}
             </span>
           </div>
@@ -352,30 +313,20 @@ export default function VoteDetailPage() {
         </div>
 
         <div className="flex items-center gap-2">
-
           {isOwner && !isDone && (
-            <button
-              onClick={() => router.push(`/vote/new?id=${vote.id}`)}
-              className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600"
-            >
+            <button onClick={() => router.push(`/vote/new?id=${vote.id}`)} className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600">
               수정
             </button>
           )}
 
           {isOwner && !isDone && (
-            <button
-              onClick={handleDone}
-              className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600"
-            >
+            <button onClick={handleDone} className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600">
               완료
             </button>
           )}
 
           {isOwner && (
-            <button
-              onClick={handleDelete}
-              className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600"
-            >
+            <button onClick={handleDelete} className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600">
               삭제
             </button>
           )}
@@ -399,30 +350,16 @@ export default function VoteDetailPage() {
       <div className="flex flex-col gap-3">
         {vote.options.map((option) => {
           const count = getOptionCount(option.id);
-
-          const percent =
-            totalVoteCount === 0
-              ? 0
-              : Math.round((count / totalVoteCount) * 100);
-
+          const percent = totalVoteCount === 0 ? 0 : Math.round((count / totalVoteCount) * 100);
           const isSelected = selectedOptionIds.includes(option.id);
           const isWinner = isDone && count > 0 && count === maxCount;
           const voterNames = getOptionVoterNames(option.id);
 
-
           return (
-            <button
-              key={option.id}
-              onClick={() => !isDone && handleSelectOption(option.id)}
-              disabled={isDone}
-              className={`border-b border-gray-200 py-4 text-left transition
-                ${isSelected && !isDone ? "bg-[#F8FBFF]" : "bg-white"}`}
-            >
+            <button key={option.id} onClick={() => !isDone && handleSelectOption(option.id)} disabled={isDone} className={`border-b border-gray-200 py-4 text-left transition ${isSelected && !isDone ? "bg-[#F8FBFF]" : "bg-white"}`}>
               <div className="mb-3 flex items-center justify-between gap-3">
                 <p className="body-15-bold">
-                  {isSelected && !isDone && (
-                    <span className="mr-1 text-[#1C70D7]">✓</span>
-                  )}
+                  {isSelected && !isDone && <span className="mr-1 text-[#1C70D7]">✓</span>}
                   {option.text}
                 </p>
 
@@ -432,25 +369,17 @@ export default function VoteDetailPage() {
               </div>
 
               <div className="h-2.5 overflow-hidden rounded-full bg-gray-200">
-                <div
-                  className={`h-full rounded-full ${isWinner ? "bg-[#1C70D7]" : "bg-gray-400"
-                    }`}
-                  style={{ width: `${percent}%` }}
-                />
+                <div className={`h-full rounded-full ${isWinner ? "bg-[#1C70D7]" : "bg-gray-400"}`} style={{ width: `${percent}%` }} />
               </div>
 
               <div className="mt-2 flex items-center justify-between gap-2">
                 <div className="min-h-5">
                   {!vote.isAnonymous && isVoted && voterNames.length > 0 && (
-                    <p className="text-xs text-gray-400">
-                      {voterNames.join(", ")}
-                    </p>
+                    <p className="text-xs text-gray-400">{voterNames.join(", ")}</p>
                   )}
 
                   {vote.isAnonymous && isVoted && count > 0 && (
-                    <p className="text-xs text-gray-400">
-                      {count}명이 선택했어요.
-                    </p>
+                    <p className="text-xs text-gray-400">{count}명이 선택했어요.</p>
                   )}
                 </div>
 
@@ -463,13 +392,9 @@ export default function VoteDetailPage() {
 
       {!isDone && (
         <div className="mt-6 flex gap-2">
-          <MainButton
-            onClick={handleVote}
-            className="w-full"
-          >
+          <MainButton onClick={handleVote} className="w-full">
             {isVoted ? "다시 투표" : "투표하기"}
           </MainButton>
-
         </div>
       )}
     </PageLayout>
