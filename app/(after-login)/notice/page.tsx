@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-// 페이지 이동용
 import { useRouter } from "next/navigation";
+import { db } from "@/app/lib/firebase";
 
-// 공통 뒤로가기 버튼
-import BackButton from "@/app/components/BackButton";
+import BackButton from "@/app/components/common/BackButton";
+import PageLayout from "@/app/components/common/PageLayout";
+import MainButton from "@/app/components/common/MainButton";
 
 // Firebase
 import {
@@ -16,8 +16,6 @@ import {
     where,
     orderBy,
 } from "firebase/firestore";
-
-import { db } from "@/app/lib/firebase";
 
 // 화면에서 사용할 타입
 type Notice = {
@@ -107,13 +105,14 @@ export default function NoticePage() {
     };
 
     return (
-        <main className="px-5 py-4">
+        <PageLayout>
             {/* 뒤로가기 버튼 */}
             <BackButton />
 
             {/* 설명 문구 */}
-            <p className="mt-2 text-xs text-gray-500">
-                공지사항이에요! 누구나 등록할 수 있답니다~
+             <p className="title-24">
+                공지사항이에요! <br/>
+                누구나 등록할 수 있어요
             </p>
 
             {/* 게시판 영역 */}
@@ -131,11 +130,11 @@ export default function NoticePage() {
                                 {notice.title}
                             </p>
 
-                            {/* {notice.isNotice && (
+                            {notice.isNotice && (
                                 <span className="shrink-0 rounded-full bg-pink-100 px-2 py-1 text-[11px] font-bold text-pink-500">
                                     공지
                                 </span>
-                            )} */}
+                            )}
                         </div>
 
                         <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
@@ -154,12 +153,11 @@ export default function NoticePage() {
             </section>
 
             {/* 추가 버튼 */}
-            <button
-                onClick={() => router.push("/notice/new")}
-                className="mt-5 rounded-2xl bg-pink-500 px-6 py-3 text-sm font-bold text-white shadow-md"
+            <MainButton className="mt-5 w-full"  // 꽉 차는 버튼! 반반은 flex-1, 작은건 w-[120px] 정도로 구분..
+                onClick={() => router.push("/notice/new")}                
             >
                 추가
-            </button>
-        </main>
+            </MainButton>
+        </PageLayout>
     );
 }

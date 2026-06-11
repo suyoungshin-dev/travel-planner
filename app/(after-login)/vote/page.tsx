@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import BackButton from "@/app/components/BackButton";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+import BackButton from "@/app/components/common/BackButton";
+import PageLayout from "@/app/components/common/PageLayout";
+import MainButton from "@/app/components/common/MainButton";
 
 import {
     collection,
@@ -84,7 +87,7 @@ export default function VotePage() {
                 crDT: data.crDT ?? null,
             };
         });
-        
+
         voteList.sort((a, b) => {
 
             // 진행중(active)을 위로
@@ -108,7 +111,7 @@ export default function VotePage() {
     const router = useRouter();
 
     return (
-        <main className="px-4 py-3">
+        <PageLayout>
             {/* 뒤로가기 버튼 */}
             <BackButton />
 
@@ -117,13 +120,6 @@ export default function VotePage() {
                 <p className="text-xs text-gray-500">
                     민주주의의 꽃은 투표입니다~
                 </p>
-
-                <button
-                    onClick={() => router.push("/vote/new")}
-                    className="rounded-xl bg-pink-500 px-4 py-2 text-sm font-bold text-white shadow-md"
-                >
-                    + 추가
-                </button>
             </div>
 
             {/* 투표 목록 */}
@@ -148,8 +144,8 @@ export default function VotePage() {
                                         <span
                                             className={
                                                 vote.status === "active"
-                                                    ? "shrink-0 rounded-full bg-pink-100 px-2 py-1 text-[11px] font-bold text-pink-500"
-                                                    : "shrink-0 rounded-full bg-gray-100 px-2 py-1 text-[11px] font-bold text-gray-500"
+                                                    ? "status-badge"
+                                                    : "status-badge-gray"
                                             }
                                         >
                                             {vote.status === "active" ? "진행" : "완료"}
@@ -158,20 +154,21 @@ export default function VotePage() {
 
                                     {/* 기간 */}
                                     <p className="mt-2 text-sm text-gray-500">
-                                        투표기간 : {vote.startDT.slice(2)} ~ {vote.endDT.slice(2)}
-                                    </p>
-
-                                    {/* 등록자 */}
-                                    <p className="mt-1 text-xs text-gray-400">
-                                        등록자 : {vote.crName || "-"}
-                                    </p>
-
+                                        {vote.startDT.slice(2)} ~ {vote.endDT.slice(2)}
+                                    </p>                                    
                                 </div>
                             </Link>
                         ))}
                     </div>
                 )}
+                <MainButton
+                    onClick={() => router.push("/vote/new")}
+                    className="mt-8 h-[54px] w-full rounded-[12px]"
+                >
+                    추가
+                </MainButton>
             </section>
-        </main>
+
+        </PageLayout>
     );
 }

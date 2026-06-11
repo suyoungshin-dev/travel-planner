@@ -5,11 +5,10 @@ import { useEffect, useState } from "react";
 // 페이지 이동용
 import { useRouter } from "next/navigation";
 
-// 공통 뒤로가기 버튼
-import BackButton from "@/app/components/BackButton";
-
 // 버튼
-import MainButton from "@/app/components/common/mainbutton";
+import BackButton from "@/app/components/common/BackButton";
+import MainButton from "@/app/components/common/MainButton";
+import PageLayout from "@/app/components/common/PageLayout";
 
 // Firebase
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
@@ -90,16 +89,15 @@ export default function HistoryTripPage() {
   };
 
   return (
-    <main className="relative px-5 py-4">
+    <PageLayout>
       {/* 뒤로가기 버튼 */}
       <BackButton />
 
       {/* 설명 문구 */}
-<p className="mt-2 text-[24px] font-bold leading-[34px] text-[#111111]">
-  추가와 수정이 자유로운
-  <br />
-  여행 게시판!
-</p>
+      <p className="title-24">
+        추가와 수정이 자유로운
+        <br />여행 게시판!
+      </p>
 
       {/* 카드 리스트 영역 */}
       <section className="mt-4 space-y-3">
@@ -148,17 +146,10 @@ export default function HistoryTripPage() {
       {/* 추가 버튼 */}
       <MainButton
         onClick={() => router.push("/history-trip/new")}
-        className="
-          absolute
-          left-[24px]
-          right-[24px]
-          top-[530px]
-          h-[54px]
-          rounded-[12px]
-        "
+        className="mt-8 h-[54px] w-full rounded-[12px]"
       >
         추가
       </MainButton>
-    </main>
+    </PageLayout>
   );
 }

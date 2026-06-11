@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import BackButton from "@/app/components/BackButton";
+import BackButton from "@/app/components/common/BackButton";
+import PageLayout from "@/app/components/common/PageLayout";
 
 // Firestore에서 컬렉션 조회용 함수들
 import {
@@ -107,15 +108,15 @@ export default function AdminCodePage() {
 
     if (loading) {
         return (
-            <main className="min-h-screen bg-white p-6">
+            <PageLayout>
                 <BackButton />
                 <p className="mt-6 text-sm text-gray-400">불러오는 중...</p>
-            </main>
+           </PageLayout>
         );
     }
 
     return (
-        <main className="min-h-screen bg-white p-6">
+        <PageLayout>
             <BackButton />
 
             <section className="mt-8 rounded-2xl border border-pink-100 bg-pink-50 p-5 shadow-sm">
@@ -165,6 +166,6 @@ export default function AdminCodePage() {
                     </button>
                 </div>
             </section>
-        </main>
+        </PageLayout>
     );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import BackButton from "@/app/components/BackButton";
+import BackButton from "@/app/components/common/BackButton";
 
 import {
   doc,
@@ -13,6 +13,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
+import PageLayout from "@/app/components/common/PageLayout";
 
 type LoginUser = {
   id: string;
@@ -279,19 +280,19 @@ export default function VoteDetailPage() {
 
   if (isLoading) {
     return (
-      <main className="px-4 py-3">
+      <PageLayout>
         <BackButton />
         <p className="mt-6 text-sm text-gray-500">불러오는 중...</p>
-      </main>
+      </PageLayout>
     );
   }
 
   if (!vote || vote.is_deleted) {
     return (
-      <main className="px-4 py-3">
+      <PageLayout>
         <BackButton />
         <p className="mt-6 text-sm text-gray-500">투표를 찾을 수 없습니다.</p>
-      </main>
+      </PageLayout>
     );
   }
 
@@ -323,7 +324,7 @@ export default function VoteDetailPage() {
   );
 
   return (
-    <main className="px-4 py-3">
+    <PageLayout>
       <BackButton />
 
       <div className="mb-2 flex items-start justify-between gap-3">
@@ -348,14 +349,35 @@ export default function VoteDetailPage() {
           <p className="mt-1 text-xs text-gray-400">등록자: {vote.crName}</p>
         </div>
 
-        {isOwner && !isDone && (
-          <button
-            onClick={() => router.push(`/vote/new?id=${vote.id}`)}
-            className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600"
-          >
-            수정
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+
+          {isOwner && !isDone && (
+            <button
+              onClick={() => router.push(`/vote/new?id=${vote.id}`)}
+              className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600"
+            >
+              수정
+            </button>
+          )}
+
+          {isOwner && (
+            <button
+              onClick={handleDone}
+              className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600"
+            >
+              완료
+            </button>
+          )}
+
+          {isOwner && (
+            <button
+              onClick={handleDelete}
+              className="shrink-0 rounded-lg bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600"
+            >
+              삭제
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
@@ -453,32 +475,17 @@ export default function VoteDetailPage() {
 
       {!isDone && (
         <div className="mt-6 flex gap-2">
-          {isOwner && (
-            <button
-              onClick={handleDone}
-              className="flex-1 rounded-xl bg-gray-100 px-5 py-3 font-bold text-gray-500"
-            >
-              완료
-            </button>
-          )}
+
 
           <button
             onClick={handleVote}
             className="flex-1 rounded-xl bg-pink-500 px-5 py-3 font-bold text-white"
           >
-            {isVoted ? "투표 수정" : "투표하기"}
+            {isVoted ? "다시 투표" : "투표하기"}
           </button>
 
-          {isOwner && (
-            <button
-              onClick={handleDelete}
-              className="rounded-xl bg-red-50 px-5 py-3 font-bold text-red-500"
-            >
-              삭제
-            </button>
-          )}
         </div>
       )}
-    </main>
+    </PageLayout>
   );
 }

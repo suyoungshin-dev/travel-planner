@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Megaphone, ChevronRight } from "lucide-react";
+import { MENU_LIST } from "@/app/constants/menu";
 
 // Firebase
 import {
@@ -198,41 +199,30 @@ export default function Home() {
       </section>
 
       <div className="mt-6 grid w-fit grid-cols-2 gap-4">
-        <Link
-          href="/history-trip"
-          className="bg-[#F5F7FA] text-[#000000] rounded-[16px] font-semibold 
-           w-32 h-32 flex items-center justify-center text-sm text-center"
-        >
-          여행
-        </Link>
+        {MENU_LIST.map((menu) => (
+          <Link
+            key={menu.href}
+            href={menu.href}
+            className="bg-[#F5F7FA] text-[#000000] rounded-[16px] font-semibold 
+                       w-32 h-32 flex items-center justify-center text-sm text-center"
+          >
+            <div className="flex items-center gap-1">
 
-        <Link
-          href="/notice"
-          className="bg-[#F5F7FA] text-[#000000] rounded-[16px] font-semibold
-          w-32 h-32 flex items-center justify-center text-sm text-center"
-        >
-          공지사항
-        </Link>
+              {/* 메뉴명 */}
+              <span>{menu.title}</span>
 
-        <Link
-          href="/board"
-          className="bg-[#F5F7FA] text-[#000000] rounded-[16px] font-semibold
-          w-32 h-32 flex items-center justify-center text-sm text-center"
-        >
-          한줄대화
-        </Link>
-
-        <Link
-          href="/vote"
-          className="bg-[#F5F7FA] text-[#000000] rounded-[16px] font-semibold
-          w-32 h-32 flex items-center justify-center text-sm text-center"
-        >
-          <div>
-            <p>
-              투표 {activeVoteCount > 0 ? `(${activeVoteCount}건)` : ""}
-            </p>
-          </div>
-        </Link>
+              {/* 투표 건수 */}
+              {menu.showCount && activeVoteCount > 0 && (
+                <span
+                  className="flex h-[16px] min-w-[16px] items-center justify-center rounded-full
+                             bg-[#2F80ED] px-[4px] text-[10px] font-bold text-white"
+                >
+                  {activeVoteCount}
+                </span>
+              )}
+            </div>
+          </Link>
+        ))}
       </div>
     </main>
   );

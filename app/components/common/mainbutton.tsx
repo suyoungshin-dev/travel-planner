@@ -19,11 +19,13 @@ export default function MainButton({
       onClick={onClick}
       disabled={disabled}
       className={`
-        rounded-[12px]
+        h-[54px]
+
+        rounded-[8px]
         bg-[#1C70D7]
 
         body-15-bold
-        text-[#FFFFFF]
+        text-white
 
         transition
         active:scale-[0.98]

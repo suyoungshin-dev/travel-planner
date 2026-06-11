@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import BackButton from "@/app/components/BackButton";
+
+import BackButton from "@/app/components/common/BackButton";
+import PageLayout from "@/app/components/common/PageLayout";
+import SectionDivider from "@/app/components/common/SectionDivider";
 
 import {
   doc,
@@ -336,17 +339,17 @@ export default function HistoryTripDetailPage() {
 
   if (!tripDetail) {
     return (
-      <main className="px-5 py-4">
+      <PageLayout>
         <BackButton />
         <p className="mt-4 text-sm text-gray-400">
           데이터를 불러오는 중이에요...
         </p>
-      </main>
+      </PageLayout>
     );
   }
 
   return (
-    <main className="px-5 py-4">
+    <PageLayout>
       <BackButton />
 
       <p className="title-24">
@@ -354,12 +357,13 @@ export default function HistoryTripDetailPage() {
       </p>
 
       {/* 구분 영역 */}
-      <div className="my-6 -mx-5 h-[8px] bg-[#F5F7FA]" />
+      <SectionDivider />
 
       <section className="mt-4 bg-white">
         <div className="mb-5">
           <div className="mb-2">
-            <span className="text-[12px] font-bold text-[#1C70D7] ">제목 *</span>
+            <span className="label-text">제목 </span>
+            <span className="required-star"> * </span>
           </div>
 
           <input
@@ -370,12 +374,13 @@ export default function HistoryTripDetailPage() {
                 title: e.target.value,
               })
             }
-            className="w-full rounded-xl border border-[#DCDCDC] px-4 py-3"
+            className="form-input"
           />
         </div>
 
         <div className="mb-5">
-          <span className="text-[12px] font-bold text-[#1C70D7]">날짜 *</span>
+          <span className="label-text">날짜 </span>
+          <span className="required-star"> * </span>
 
           <div className="flex items-center gap-2">
             <input
@@ -389,7 +394,7 @@ export default function HistoryTripDetailPage() {
                   startDate: formatDateInput(e.target.value),
                 })
               }
-              className="w-full rounded-xl border border-[#DCDCDC] px-4 py-3"
+              className="form-input"
             />
 
             <span className="text-gray-400">~</span>
@@ -405,13 +410,13 @@ export default function HistoryTripDetailPage() {
                   endDate: formatDateInput(e.target.value),
                 })
               }
-              className="w-full rounded-xl border border-[#DCDCDC] px-4 py-3"
+              className="form-input"
             />
           </div>
         </div>
 
         <div className="mb-5">
-          <span className="text-[12px] font-bold text-[#1C70D7]">숙소/장소</span>
+          <span className="label-text">숙소/장소</span>
 
           <input
             value={tripDetail.location}
@@ -421,15 +426,15 @@ export default function HistoryTripDetailPage() {
                 location: e.target.value,
               })
             }
-            className="w-full rounded-xl border border-[#DCDCDC] px-4 py-3"
+            className="form-input"
           />
         </div>
 
         {/* 구분 영역 */}
-        <div className="my-6 -mx-5 h-[8px] bg-[#F5F7FA]" />
+        <SectionDivider />
 
         <div className="mb-5">
-          <span className="text-[12px] font-bold text-[#1C70D7]">내용</span>
+          <span className="label-text">내용</span>
 
           <textarea
             value={tripDetail.notice}
@@ -439,12 +444,12 @@ export default function HistoryTripDetailPage() {
                 notice: e.target.value,
               })
             }
-            className="h-36 w-full resize-none rounded-xl border border-[#DCDCDC] px-4 py-3 text-[13px]"
+            className="form-textarea"
           />
         </div>
 
         <div className="mb-5">
-          <span className="text-[12px] font-bold text-[#1C70D7]">준비물</span>
+          <span className="label-text">준비물</span>
 
           <textarea
             value={tripDetail.supplies}
@@ -454,16 +459,13 @@ export default function HistoryTripDetailPage() {
                 supplies: e.target.value,
               })
             }
-            className="h-28 w-full resize-none rounded-xl border border-[#DCDCDC] px-4 py-3 text-[13px]"
+            className="form-textarea"
           />
         </div>
 
         <div className="mb-5">
-          <span className="text-[12px] font-bold text-[#1C70D7]">지출내용</span>
-
-          <span className="ml-2 text-xs text-gray-400">
-            (예. 항목-금액 / 콤마없이)
-          </span>
+          <span className="label-text">지출내용</span>
+          <span className="label-desc">(예. 항목-금액 / 콤마없이)</span>
 
           <textarea
             value={tripDetail.expenseContent}
@@ -476,44 +478,48 @@ export default function HistoryTripDetailPage() {
                 totalExpense: calculateTotalExpense(expenseContent),
               });
             }}
-            className="h-32 w-full resize-none rounded-xl border border-[#DCDCDC] px-4 py-3 text-[13px]"
+            className="form-textarea"
           />
         </div>
 
         <div className="mt-4">
-          <span className="text-[12px] font-bold text-[#1C70D7]">총 사용금액</span>
+          <span className="label-text">총 사용금액 </span>
 
           <input
             value={`${tripDetail.totalExpense.toLocaleString()}원`}
             readOnly
-            disabled
-            className="w-full rounded-xl border border-[#DCDCDC] px-4 py-3 font-bold text-gray-700 disabled:bg-gray-50"
+            className="form-input form-input-readonly"
           />
         </div>
 
-        <div className="mt-5 flex gap-2">
+        <div className="mt-5 flex gap-3">
+
+          {/* 저장 / 추가 */}
           <button
             onClick={handleUpdate}
-            className="flex-1 rounded-[8px] bg-[#1C70D7] py-3 text-sm font-bold text-white"
+            className="flex-1 h-[54px] rounded-[8px] bg-[#1C70D7] text-sm font-bold text-white"
           >
             {tripId === "new" ? "추가" : "저장"}
           </button>
 
-          {tripId !== "new" && canDelete && (
+          {/* 삭제 */}
+          {/* {tripId !== "new" && canDelete && (
             <button
               onClick={handleDelete}
-              className="rounded-[8px] bg-gray-200 px-6 py-3 text-sm font-bold text-gray-700"
+              className="h-[54px] rounded-[8px] bg-[#FFEAEA] px-5 text-sm font-bold text-[#FF4D4F]"
             >
               삭제
             </button>
-          )}
+          )} */}
 
+          {/* 취소 */}
           <button
             onClick={() => router.push("/history-trip")}
-            className="rounded-[8px] bg-gray-100 px-6 py-3 text-sm font-bold text-gray-600"
+            className="flex-1 h-[54px] rounded-[8px] bg-[#F5F7FA] text-sm font-bold text-[#191919]"
           >
             취소
           </button>
+
         </div>
 
         <hr className="my-5 border-gray-200" />
@@ -535,6 +541,6 @@ export default function HistoryTripDetailPage() {
           </div>
         </div>
       </section>
-    </main>
+    </PageLayout>
   );
 }

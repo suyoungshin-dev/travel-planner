@@ -65,6 +65,15 @@ body {
   line-height: 140%;
 }
 
+
+.caption-12 {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 140%;
+  color: #BBBBBB;
+}
+
+
 /* placeholder */
 .input-primary {
   font-size: 15px;
@@ -82,4 +91,158 @@ body {
   line-height: 140%;
 
   color: #BBBBBB;
+}
+
+/* 라벨 텍스트 */
+.label-text {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0;
+  text-align: left;
+  color: #1C70D7;
+  font-family: "Pretendard", sans-serif;
+}
+
+.required-star {
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 140%;
+  color: #1C70D7;
+}
+
+.label-desc {
+  margin-left: 8px;
+
+  font-size: 11px;
+  font-weight: 400;
+
+  color: #717274;
+}
+
+/* 액션 버튼 텍스트 */
+.action-text {
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #1C70D7;
+
+  font-family: "Pretendard", sans-serif;
+}
+
+.action-text-gray {
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #717274;
+
+  font-family: "Pretendard", sans-serif;
+}
+
+/* 기본 입력박스 */
+.form-input {
+  width: 100%;
+  height: 54px;
+
+  padding: 0 16px;
+
+  border: 1px solid #DDDDDD;
+  border-radius: 12px;
+
+  background: #FFFFFF;
+
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 140%;
+  color: #191919;
+
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #1C70D7;
+}
+
+.form-input::placeholder {
+  color: #BBBBBB;
+}
+
+.form-input-readonly {
+  background: #F5F7FA;
+  color: #666666;
+}
+
+/* textarea */
+.form-textarea {
+  width: 100%;
+min-height: 160px;
+
+  padding: 16px;    
+
+  border: 1px solid #DDDDDD;
+  border-radius: 12px;
+
+  background: #FFFFFF;
+
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 140%;
+  color: #191919;
+
+  resize: none;
+  outline: none;
+}
+
+/* textarea focus */
+.form-textarea:focus {
+  border-color: #1C70D7;
+}
+
+/* readonly */
+.form-textarea-readonly {
+  background: #F5F7FA;
+  color: #666666;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  height: 24px;
+  padding: 0 10px;
+
+  border-radius: 999px;
+
+  background: #EEF5FF;
+
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+
+  color: #1C70D7;
+}
+
+.status-badge-gray {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  height: 24px;
+  padding: 0 10px;
+
+  border-radius: 999px;
+
+  background: #F3F4F6;
+
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+
+  color: #8A8A8A;
 }

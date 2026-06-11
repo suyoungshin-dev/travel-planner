@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import BackButton from "@/app/components/BackButton";
+import BackButton from "@/app/components/common/BackButton";
 import { useRouter } from "next/navigation";
 
 // Firebase
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
+import PageLayout from "@/app/components/common/PageLayout";
 
 // 화면에서 사용할 사용자 타입
 type User = {
@@ -153,102 +154,103 @@ export default function AdminPage() {
   };
 
   return (
-    <main className="px-5 py-4">
+    <PageLayout>
       {/* 뒤로가기 + 안내문구 */}
-      <BackButton />
-      {/* 설명 문구 */}
-      <p className="mt-2 text-xs text-gray-500">
-        사용자 정보와 집행부 권한을 관리합니다.
-      </p>
       
-      <div className="mt-6 flex justify-end">
-        <button
-          onClick={() => router.push("/admin/code")}
-          className="rounded-xl bg-pink-100 px-4 py-2 text-sm font-bold text-pink-600 hover:bg-pink-200"
-        >
-          코드 관리
-        </button>
-      </div>
+        <BackButton />
+        {/* 설명 문구 */}
+        <p className="mt-2 text-xs text-gray-500">
+          사용자 정보와 집행부 권한을 관리합니다.
+        </p>
 
-      {/* 사용자 목록 */}
-      <section className="mt-4 rounded-2xl bg-white shadow-sm">
-        {/* 테이블 헤더 */}
-        <div className="grid grid-cols-[0.8fr_1.8fr_0.6fr_0.6fr_0.8fr] border-b border-gray-200 px-4 py-3 text-xs font-bold text-gray-500">
-          <div>ID</div>
-          <div>이름</div>
-          <div className="text-center">회장</div>
-          <div className="text-center">관리</div>
-          <div className="text-center">오락부장</div>
+        <div className="mt-6 flex justify-end">
+          <button
+            onClick={() => router.push("/admin/code")}
+            className="rounded-xl bg-pink-100 px-4 py-2 text-sm font-bold text-pink-600 hover:bg-pink-200"
+          >
+            코드 관리
+          </button>
         </div>
 
         {/* 사용자 목록 */}
-        {users.map((user) => (
-          <div
-            key={user.id}
-            className="grid grid-cols-[0.8fr_1.8fr_0.6fr_0.6fr_0.8fr] items-center border-b border-gray-100 px-4 py-4 text-sm"
-          >
-            {/* 사용자 ID */}
-            <div className="text-gray-500">{user.id}</div>
-
-            {/* 사용자 이름 수정 */}
-            <div>
-              <input
-                value={user.nameText}
-                onChange={(e) => handleChangeName(user.id, e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-gray-800 outline-none focus:border-pink-300"
-                placeholder="예: 수영, 수영이"
-              />
-            </div>
-
-            {/* 회장 여부 */}
-            <div className="text-center">
-              <input
-                type="checkbox"
-                checked={user.isLeader}
-                onChange={() => handleChangeLeader(user.id)}
-                className="h-5 w-5 accent-pink-500"
-              />
-            </div>
-
-            {/* 총무 여부 */}
-            <div className="text-center">
-              <input
-                type="checkbox"
-                checked={user.isManager}
-                onChange={() => handleChangeManager(user.id)}
-                className="h-5 w-5 accent-pink-500"
-              />
-            </div>
-
-            {/* 오락부장 여부 */}
-            <div className="text-center">
-              <input
-                type="checkbox"
-                checked={user.isEvent}
-                onChange={() => handleChangeEvent(user.id)}
-                className="h-5 w-5 accent-pink-500"
-              />
-            </div>
+        <section className="mt-4 rounded-2xl bg-white shadow-sm">
+          {/* 테이블 헤더 */}
+          <div className="grid grid-cols-[0.8fr_1.8fr_0.6fr_0.6fr_0.8fr] border-b border-gray-200 px-4 py-3 text-xs font-bold text-gray-500">
+            <div>ID</div>
+            <div>이름</div>
+            <div className="text-center">회장</div>
+            <div className="text-center">관리</div>
+            <div className="text-center">오락부장</div>
           </div>
-        ))}
-      </section>
 
-      {/* 저장 / 취소 버튼 */}
-      <div className="mt-5 flex justify-end gap-2">
-        <button
-          onClick={handleCancel}
-          className="rounded-xl bg-gray-100 px-5 py-2 font-bold text-gray-500"
-        >
-          취소
-        </button>
+          {/* 사용자 목록 */}
+          {users.map((user) => (
+            <div
+              key={user.id}
+              className="grid grid-cols-[0.8fr_1.8fr_0.6fr_0.6fr_0.8fr] items-center border-b border-gray-100 px-4 py-4 text-sm"
+            >
+              {/* 사용자 ID */}
+              <div className="text-gray-500">{user.id}</div>
 
-        <button
-          onClick={handleSave}
-          className="rounded-xl bg-pink-500 px-5 py-2 font-bold text-white"
-        >
-          저장
-        </button>
-      </div>
-    </main>
+              {/* 사용자 이름 수정 */}
+              <div>
+                <input
+                  value={user.nameText}
+                  onChange={(e) => handleChangeName(user.id, e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-gray-800 outline-none focus:border-pink-300"
+                  placeholder="예: 수영, 수영이"
+                />
+              </div>
+
+              {/* 회장 여부 */}
+              <div className="text-center">
+                <input
+                  type="checkbox"
+                  checked={user.isLeader}
+                  onChange={() => handleChangeLeader(user.id)}
+                  className="h-5 w-5 accent-pink-500"
+                />
+              </div>
+
+              {/* 총무 여부 */}
+              <div className="text-center">
+                <input
+                  type="checkbox"
+                  checked={user.isManager}
+                  onChange={() => handleChangeManager(user.id)}
+                  className="h-5 w-5 accent-pink-500"
+                />
+              </div>
+
+              {/* 오락부장 여부 */}
+              <div className="text-center">
+                <input
+                  type="checkbox"
+                  checked={user.isEvent}
+                  onChange={() => handleChangeEvent(user.id)}
+                  className="h-5 w-5 accent-pink-500"
+                />
+              </div>
+            </div>
+          ))}
+        </section>
+
+        {/* 저장 / 취소 버튼 */}
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            onClick={handleCancel}
+            className="rounded-xl bg-gray-100 px-5 py-2 font-bold text-gray-500"
+          >
+            취소
+          </button>
+
+          <button
+            onClick={handleSave}
+            className="rounded-xl bg-pink-500 px-5 py-2 font-bold text-white"
+          >
+            저장
+          </button>
+        </div>
+      </PageLayout> 
   );
 }

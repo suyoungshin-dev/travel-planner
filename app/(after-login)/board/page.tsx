@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import BackButton from "@/app/components/BackButton";
+import BackButton from "@/app/components/common/BackButton";
+import PageLayout from "@/app/components/common/PageLayout";
+import MainButton from "@/app/components/common/MainButton";
 
 import {
   collection,
@@ -47,7 +49,7 @@ export default function BoardPage() {
   const [boards, setBoards] = useState<Board[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
-  
+
   const isAdmin =
     currentUser?.isLeader ||
     currentUser?.isManager ||
@@ -210,8 +212,10 @@ export default function BoardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white p-6">
+    <PageLayout>
+
       <div className="flex items-center gap-2">
+
         <BackButton />
 
         {isAdmin && (
@@ -224,8 +228,10 @@ export default function BoardPage() {
         )}
       </div>
 
-      <p className="mt-2 text-xs text-gray-500">
-        자유롭게 의견을 올려주세요.. <br />
+      <p className="title-24">
+        자유롭게 의견을 올려주세요!
+      </p>
+      <p className="caption-12">
         (데이터 용량으로 인해 비정기적으로 삭제될 수 있습니다.)
       </p>
 
@@ -234,16 +240,13 @@ export default function BoardPage() {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="한마디 남겨주세요..."
-          className="flex-1 rounded-xl border border-pink-200 px-4 py-3 outline-none"
+          className="form-input"
         />
 
         <div className="flex flex-col items-end gap-1">
-          <button
-            onClick={handleAddComment}
-            className="rounded-xl bg-pink-500 px-5 py-3 font-bold text-white shadow-md"
-          >
+          <MainButton className="w-[50px]">   
             등록
-          </button>
+          </MainButton>
 
 
         </div>
@@ -290,7 +293,7 @@ export default function BoardPage() {
                       <>
                         <button
                           onClick={() => handleSaveEdit(board.docId)}
-                          className="font-semibold text-pink-500"
+                          className="action-text"
                         >
                           저장
                         </button>
@@ -300,18 +303,18 @@ export default function BoardPage() {
                             setEditingId(null);
                             setEditContent("");
                           }}
-                          className="text-gray-400"
+                          className="action-text-gray"
                         >
                           취소
                         </button>
                       </>
                     ) : (
                       <>
-                        <button onClick={() => { setEditingId(board.docId); setEditContent(board.comment); }} className="font-semibold text-pink-500">
+                        <button onClick={() => { setEditingId(board.docId); setEditContent(board.comment); }} className="action-text">
                           수정
                         </button>
 
-                        <button onClick={() => handleDeleteComment(board.docId)} className="text-gray-400">
+                        <button onClick={() => handleDeleteComment(board.docId)} className="action-text-gray">
                           삭제
                         </button>
                       </>
@@ -323,6 +326,6 @@ export default function BoardPage() {
           );
         })}
       </section>
-    </main>
+    </PageLayout>
   );
 }

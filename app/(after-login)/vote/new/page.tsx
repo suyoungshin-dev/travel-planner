@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import BackButton from "@/app/components/BackButton";
 
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
+
+import BackButton from "@/app/components/common/BackButton";
+import PageLayout from "@/app/components/common/PageLayout";
 
 type LoginUser = {
     id: string;
@@ -179,7 +181,7 @@ export default function VoteNewPage() {
     };
 
     return (
-        <main className="px-4 py-3">
+        <PageLayout>
             <BackButton />
 
             <h1 className="mb-6 text-2xl font-bold text-gray-800">투표 등록</h1>
@@ -319,6 +321,6 @@ export default function VoteNewPage() {
                     등록
                 </button>
             </div>
-        </main>
+        </PageLayout>
     );
 }

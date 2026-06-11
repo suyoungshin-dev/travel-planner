@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import BackButton from "@/app/components/BackButton";
+import BackButton from "@/app/components/common/BackButton";
+import PageLayout from "@/app/components/common/PageLayout";
 
 import {
   doc,
@@ -41,6 +42,8 @@ export default function NoticeDetailPage() {
       : "";
 
   const isWriter = loginUserId === noticeDetail?.createdId;
+  const isNew = noticeId === "new";
+  const isEditable = isNew || isWriter;
 
   const loginUserName =
     typeof window !== "undefined"
@@ -207,31 +210,31 @@ export default function NoticeDetailPage() {
 
   if (!noticeDetail) {
     return (
-      <main className="px-5 py-4">
+      <PageLayout>
         <BackButton />
         <p className="mt-4 text-sm text-gray-400">
           데이터를 불러오는 중이에요...
         </p>
-      </main>
+      </PageLayout>
     );
   }
 
   return (
-    <main className="px-5 py-4">
+    <PageLayout>
       <BackButton />
 
 
-      <section className="mt-4 rounded-2xl bg-white p-5 shadow-sm">
+      <section className="mt-4">
         <div className="mb-5">
           <div className="mb-2 flex items-center gap-3">
             <span className="text-sm font-bold text-gray-500">제목</span>
             <span className="text-xs font-bold text-red-400">*</span>
 
-            {/* <label className="ml-auto flex items-center gap-1 text-sm text-gray-500">
+            <label className="ml-auto flex items-center gap-1 text-sm text-gray-500">
               <input
                 type="checkbox"
                 checked={noticeDetail.isNotice}
-                disabled={!isWriter && noticeId !== "new"}
+                disabled={!isEditable}
                 onChange={(e) =>
                   setNoticeDetail({
                     ...noticeDetail,
@@ -240,55 +243,76 @@ export default function NoticeDetailPage() {
                 }
               />
               공지
-            </label> */}
+            </label>
           </div>
 
-          <input
-            value={noticeDetail.title}
-            readOnly={!isWriter && noticeId !== "new"}
-            onChange={(e) =>
-              setNoticeDetail({
-                ...noticeDetail,
-                title: e.target.value,
-              })
-            }
-            className={`w-full rounded-xl border border-pink-200 px-4 py-3 ${!isWriter && noticeId !== "new"
-              ? "bg-gray-100 text-gray-500"
-              : "bg-white"
-              }`}
-          />
+          {isEditable ? (
+
+            // 수정 가능 상태
+            <input
+              value={noticeDetail.title}
+              onChange={(e) =>
+                setNoticeDetail({
+                  ...noticeDetail,
+                  title: e.target.value,
+                })
+              }
+              className="w-full rounded-xl border border-pink-200 bg-white px-4 py-3"
+            />
+
+          ) : (
+
+            // 읽기 전용 상태
+            <div
+              className="py-3 text-[20px] font-bold leading-[30px] text-[#111111]"
+            >
+              {noticeDetail.title}
+            </div>
+
+          )}
         </div>
 
         <div className="mb-5">
-          <span className="text-sm font-bold text-gray-500">내용</span>
+          <span className="text-sm font-bold text-gray-500">
+            내용
+          </span>
 
-          <textarea
-            value={noticeDetail.comment}
-            readOnly={!isWriter && noticeId !== "new"}
-            onChange={(e) =>
-              setNoticeDetail({
-                ...noticeDetail,
-                comment: e.target.value,
-              })
-            }
-            className={`h-64 w-full resize-none rounded-xl border border-pink-200 px-4 py-3 ${!isWriter && noticeId !== "new"
-                ? "bg-gray-100 text-gray-500"
-                : "bg-white"
-              }`}
-          />
+          {isEditable ? (
+
+            // 수정 가능 상태
+            <textarea
+              value={noticeDetail.comment}
+              onChange={(e) =>
+                setNoticeDetail({
+                  ...noticeDetail,
+                  comment: e.target.value,
+                })
+              }
+              className="mt-2 h-64 w-full resize-none rounded-xl border border-pink-200 bg-white px-4 py-3 "
+            />
+          ) : (
+            // 읽기 전용 상태
+            <div
+              className="mt-2 whitespace-pre-wrap break-words leading-7 text-[15px] text-[#333333] "
+            >
+              {noticeDetail.comment}
+            </div>
+
+          )}
         </div>
 
         <div className="mt-6 flex gap-3">
-          {(noticeId === "new" || isWriter) && (
+          {isEditable && (
             <button
               onClick={handleUpdate}
               className="flex-1 rounded-xl bg-pink-500 py-3 text-sm font-bold text-white"
             >
-              {noticeId === "new" ? "추가" : "저장"}
+              {isNew ? "추가" : "저장"}
             </button>
           )}
 
-          {noticeId !== "new" && isWriter && (
+          {/* 삭제는 작성자만 */}
+          {!isNew && isWriter && (
             <button
               onClick={handleDelete}
               className="flex-1 rounded-xl bg-red-400 py-3 text-sm font-bold text-white"
@@ -297,10 +321,11 @@ export default function NoticeDetailPage() {
             </button>
           )}
 
-          {noticeId !== "new" && isWriter && (
+          {/* 취소는 new, 작성자만 */}
+          {isEditable && (
             <button
-              onClick={() => router.push("/notice")}
-              className="flex-1 rounded-xl bg-red-400 py-3 text-sm font-bold text-white"              
+              onClick={handleCancel}
+              className="flex-1 rounded-xl bg-gray-100 py-3 text-sm font-bold text-gray-600"
             >
               취소
             </button>
@@ -321,6 +346,6 @@ export default function NoticeDetailPage() {
           </div>
         </div>
       </section>
-    </main>
+    </PageLayout>
   );
 }
